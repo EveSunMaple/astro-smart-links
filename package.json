@@ -9,7 +9,7 @@
   "homepage": "https://astro-smart-links.vercel.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/EveSunMaple/rehype-smart-links"
+    "url": "git+https://github.com/EveSunMaple/rehype-smart-links.git"
   },
   "bugs": "https://github.com/EveSunMaple/rehype-smart-links/issues",
   "keywords": [
@@ -47,8 +47,8 @@
     "node": ">=18.17.0"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts --format esm --dts",
-    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --watch",
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --watch --clean",
     "example": "cd example && pnpm dev",
     "example:build": "cd example && pnpm build",
     "lint": "eslint . --ext .ts",
