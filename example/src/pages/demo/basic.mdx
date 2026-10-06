@@ -1,11 +1,11 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 
-<Layout title="基本演示" description="rehype-smart-links 基本功能演示" activeTab="basic">
+<Layout title="基本演示" description="astro-smart-links 基本功能演示" activeTab="basic">
 
 # 基本功能演示
 
-本页面展示了 rehype-smart-links 的基本功能。您可以看到不同类型的链接是如何被处理和样式化的。
+本页面展示了 astro-smart-links 的基本功能。您可以看到不同类型的链接是如何被处理和样式化的。
 
 ## 内部链接
 
@@ -37,7 +37,7 @@ import PageNavigation from '../../components/PageNavigation.astro'
 ```js
 // Astro 配置示例 (astro.config.mjs)
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {

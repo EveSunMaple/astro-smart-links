@@ -1,171 +1,138 @@
 import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 
-<Layout title="Installation Guide" description="Quick start guide for using rehype-smart-links plugin" activeTab="quick-start" lang="en">
+<Layout title="Installation" description="Get started with astro-smart-links" activeTab="quick-start" lang="en">
 
-# Quick Start Guide
+# Quick Start
 
-rehype-smart-links is a rehype plugin that adds smart functionality to Markdown links. This guide will help you quickly install and configure the plugin.
+astro-smart-links is an Astro integration that styles internal links, broken internal links and external links in your Markdown, and checks for broken links at the end of the build.
 
 ## Installation
 
-Install the plugin using your preferred package manager:
+Install the package with your preferred package manager:
 
 ```bash
-# Using npm
-npm install rehype-smart-links
+# npm
+npm install astro-smart-links
 
-# Using yarn
-yarn add rehype-smart-links
+# yarn
+yarn add astro-smart-links
 
-# Using pnpm
-pnpm add rehype-smart-links
+# pnpm
+pnpm add astro-smart-links
 ```
 
-## Basic Configuration
+## Basic configuration
 
-### Using with Astro
-
-Add the plugin to your `astro.config.mjs` file:
+Register the integration in `astro.config.mjs`:
 
 ```js
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
 export default defineConfig({
-  markdown: {
-    rehypePlugins: [
-      // Basic usage (default settings)
-      rehypeSmartLinks,
-      
-      // Or with custom options
-      [rehypeSmartLinks, {
-        internalLinkClass: 'internal-link',
-        brokenLinkClass: 'broken-link',
-        externalLinkClass: 'external-link',
-        routesFile: './.smart-links-routes.json', // Path to routes file
-        includeAllFiles: false,  // Whether to include all file types
-      }]
-    ]
-  }
+  integrations: [
+    smartLinks({
+      internalLinkClass: 'internal-link',
+      externalLinkClass: 'external-link',
+      brokenLinkClass: 'broken-link',
+    }),
+  ],
 });
 ```
 
-### Using with Next.js
+During the build the integration will:
 
-In Next.js projects, you can use MDX and rehype plugins:
+1. Add classes, `target`, `rel` and an icon to external links.
+2. Add the `internal-link` class to internal links.
+3. Validate every internal link against the real route table once the build is done, highlight broken links with the `broken-link` class and print a report.
+
+**No second build or routes script is required anymore.** The old `astro build && rehype-smart-links build && astro build` flow has been removed.
+
+### Fail the build on broken links
 
 ```js
-// next.config.js
-const withMDX = require('@next/mdx')({
-  options: {
-    rehypePlugins: [
-      require('rehype-smart-links')
-    ]
-  }
-})
-
-module.exports = withMDX({
-  pageExtensions: ['js', 'jsx', 'md', 'mdx'],
-})
+smartLinks({
+  failOnBroken: true,
+  reportFile: '.smart-links-report.json',
+}),
 ```
 
-### Using with Gatsby
+## Using it outside Astro
 
-Configure in Gatsby projects:
+If your project processes Markdown with rehype (Next.js, Gatsby, ...), use the named rehype plugin export. In that case you provide the routes yourself:
 
 ```js
-// gatsby-config.js
+const { rehypeSmartLinks } = require('astro-smart-links');
+
 module.exports = {
-  plugins: [
-    {
-      resolve: `gatsby-plugin-mdx`,
-      options: {
-        rehypePlugins: [
-          require('rehype-smart-links')
-        ],
-      },
-    },
+  rehypePlugins: [
+    [rehypeSmartLinks, { routes: ['/', '/about'] }],
   ],
-}
+};
 ```
 
-## Adding Styles
+Routes can come from `routes` (array), `routesFile` (JSON file) or `publicDir` (build directory). When none is provided, every internal link is treated as valid and only styled.
 
-The plugin adds the following CSS classes for different types of links:
+## Styling
 
-- `internal-link`: Applied to internal links (pointing to pages within your site)
-- `broken-link`: Applied to broken internal links (pointing to non-existent pages)
-- `external-link`: Applied to external links (pointing to other websites)
+The plugin adds the following CSS classes:
 
-You can add styles in your global CSS file:
+- `internal-link`: internal links (pages of your own site)
+- `broken-link`: broken internal links (pages that do not exist)
+- `external-link`: external links (other websites)
+
+Add styles in your global CSS file:
 
 ```css
-/* Internal link styles */
+/* Internal links */
 .internal-link {
   color: #3b82f6;
-  position: relative;
 }
 
-.internal-link::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 1px;
-  bottom: -2px;
-  left: 0;
-  background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.internal-link:hover::after {
-  transform: scaleX(1);
-}
-
-/* Broken link styles */
+/* Broken links (Wikipedia-style red links) */
 .broken-link {
   color: #ef4444;
   text-decoration: line-through;
   opacity: 0.8;
 }
 
-/* External link styles */
+/* External links */
 .external-link {
   color: #10b981;
-  position: relative;
-  padding-right: 1.2em;
 }
 
-.external-link::after {
-  content: '↗';
-  position: absolute;
-  right: 0;
-  font-size: 0.8em;
+.external-link .external-icon {
+  margin-left: 0.25em;
+  font-size: 0.75em;
+  opacity: 0.8;
 }
 ```
 
-## Advanced Configuration Options
-
-rehype-smart-links provides multiple configuration options:
+## Main options
 
 | Option | Type | Default | Description |
-|------|------|--------|------|
-| `internalLinkClass` | `string` | `'internal-link'` | CSS class applied to internal links |
-| `brokenLinkClass` | `string` | `'broken-link'` | CSS class applied to broken links |
-| `externalLinkClass` | `string` | `'external-link'` | CSS class applied to external links |
-| `content` | `object` | `{ type: 'text', value: '↗' }` | Content added to external links |
-| `contentClass` | `string` | `'external-icon'` | CSS class applied to the external link icon |
-| `routesFile` | `string` | `'./.smart-links-routes.json'` | Path to the routes mapping file (should match CLI output location) |
-| `includeAllFiles` | `boolean` | `false` | Whether to include all files in route checks |
-| `target` | `string` | `'_blank'` | Target attribute for external links |
-| `rel` | `string` | `'noopener noreferrer'` | Rel attribute for external links |
-| `externalLinkAttributes` | `object` | `{ target: '_blank', rel: 'noopener noreferrer' }` | HTML attributes applied to external links |
-| `wrapperTemplate` | `function` | | Custom link wrapper template function |
+|--------|------|---------|-------------|
+| `internalLinkClass` | `string` | `'internal-link'` | CSS class for internal links |
+| `externalLinkClass` | `string` | `'external-link'` | CSS class for external links |
+| `brokenLinkClass` | `string` | `'broken-link'` | CSS class for broken links |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | Content appended to external links, set to `null` to disable |
+| `contentClass` | `string` | `'external-icon'` | CSS class of the external icon |
+| `target` / `rel` | `string` | `'_blank'` / `'noopener noreferrer'` | External link attributes |
+| `ignore` | `(string \| RegExp)[]` | `[]` | Links to skip (prefix match or RegExp) |
+| `routes` | `string[]` | — | Explicit route list |
+| `routesFile` | `string` | — | Path to a routes JSON file |
+| `publicDir` | `string` | — | Build directory to scan for routes |
+| `base` | `string` | Astro `base` config | Site sub-path |
+| `wrapperTemplate` | `function` | — | Fully customize the link HTML |
+| `customInternalLinkTransform` | `function` | — | Custom transform for internal links |
+| `customExternalLinkTransform` | `function` | — | Custom transform for external links |
+| `customBrokenLinkTransform` | `function` | — | Custom transform for broken links |
+| `failOnBroken` | `boolean` | `false` | Integration option: fail the build on broken links |
+| `reportFile` | `string` | — | Integration option: write a report file (`.json` or `.html`) |
 
-Check out [Advanced Demo](/en/demo/advanced) for more examples of customization options.
+See the [advanced demo](/en/demo/advanced) for more customization examples.
 
-<PageNavigation currentPath="/en/quick-start" />
+<PageNavigation currentPath="/en/quick-start" lang="en" />
 
-</Layout> 
+</Layout>

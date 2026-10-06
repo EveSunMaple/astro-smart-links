@@ -2,11 +2,11 @@ import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 import CodeExample from '../../../components/CodeExample.astro'
 
-<Layout title="DaisyUI Styles" description="Combining rehype-smart-links with DaisyUI components" activeTab="daisyui" lang="en">
+<Layout title="DaisyUI Styles" description="Combining astro-smart-links with DaisyUI components" activeTab="daisyui" lang="en">
 
 # DaisyUI Component Integration
 
-This page demonstrates how to use DaisyUI components to style links processed by rehype-smart-links.
+This page demonstrates how to use DaisyUI components to style links processed by astro-smart-links.
 
 ## Using DaisyUI Badges
 
@@ -22,11 +22,13 @@ You can use DaisyUI badges to create visually distinct links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import tailwind from '@astrojs/tailwind';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
@@ -55,11 +57,13 @@ Transform your markdown links into DaisyUI buttons:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import tailwind from '@astrojs/tailwind';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
@@ -88,11 +92,13 @@ Create links with DaisyUI link styling:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import tailwind from '@astrojs/tailwind';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
@@ -121,12 +127,14 @@ Wrapping links in DaisyUI cards for rich content links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
@@ -191,12 +199,14 @@ Enhancing links with DaisyUI tooltips:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
@@ -240,7 +250,7 @@ export default defineConfig({
 
 ## Integration with DaisyUI Themes
 
-DaisyUI's theme system works seamlessly with rehype-smart-links, allowing your links to adapt to the currently active theme:
+DaisyUI's theme system works seamlessly with astro-smart-links, allowing your links to adapt to the currently active theme:
 
 <CodeExample
   title="Theme-Aware Links"
@@ -250,30 +260,28 @@ DaisyUI's theme system works seamlessly with rehype-smart-links, allowing your l
   lang="en"
 >
 ```js
-// tailwind.config.js
-module.exports = {
-  plugins: [require("daisyui")],
-  daisyui: {
-    themes: ["light", "dark", "cupcake", "cyberpunk"],
-  }
+/* global.css (daisyUI 5 is configured in CSS) */
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake, cyberpunk;
 }
 
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import tailwind from '@astrojs/tailwind';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
       {
-        className: {
-          internal: 'link link-primary',
-          external: 'link link-accent',
-          broken: 'link link-error'
-        }
+        internalLinkClass: 'link link-primary',
+          externalLinkClass: 'link link-accent',
+          brokenLinkClass: 'link link-error'
       }
     ]]
   }
@@ -295,12 +303,14 @@ You can combine multiple DaisyUI components for complex link styling:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  integrations: [tailwind()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 

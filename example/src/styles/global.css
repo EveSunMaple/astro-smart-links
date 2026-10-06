@@ -1,11 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
 
 @layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
   body {
     @apply min-h-screen bg-base-100;
   }
+
   code {
     font-size: 14px;
   }
@@ -36,9 +47,10 @@
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* 美化菜单项 */
@@ -61,29 +73,36 @@
 
 .astro-code {
   @apply relative my-6 rounded-xl border border-base-300 bg-transparent overflow-hidden;
+}
 
-  &-toolbar {
-    @apply sticky top-0 z-10 flex justify-between items-center px-4 py-2 bg-base-200 border-b border-base-300;
-    &-language {
-      @apply text-sm font-semibold text-base-content;
-    }
-  }
+.astro-code-toolbar {
+  @apply sticky top-0 z-10 flex justify-between items-center px-4 py-2 bg-base-200 border-b border-base-300;
+}
 
-  &-content {
-    @apply overflow-x-auto p-4 bg-transparent;
+.astro-code-toolbar-language {
+  @apply text-sm font-semibold text-base-content;
+}
 
-    pre {
-      @apply bg-transparent;
-      counter-reset: line;
-    }
+.astro-code-content {
+  @apply overflow-x-auto p-4 bg-transparent;
+}
 
-    .line {
-      counter-increment: line;
+.astro-code-content pre {
+  @apply bg-transparent;
+  counter-reset: line;
+}
 
-      &::before {
-        content: counter(line);
-        @apply text-current mr-4 inline-block w-4 text-right;
-      }
-    }
-  }
+.astro-code-content .line {
+  counter-increment: line;
+}
+
+.astro-code-content .line::before {
+  content: counter(line);
+  @apply text-current mr-4 inline-block w-4 text-right;
+}
+
+/* 目录锚点滚动时避开粘性顶栏 */
+.toc-container :target,
+.prose :is(h2, h3, h4) {
+  scroll-margin-top: 5rem;
 }

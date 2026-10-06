@@ -75,10 +75,22 @@ export interface Props {
   editPath?: string;
 }
 
+// Pages that are implemented as `<route>/index.mdx` instead of `<route>.mdx`.
+const indexRoutes = new Set(["/", "/en", "/quick-start", "/en/quick-start"]);
+
+function defaultEditPath(path: string): string {
+  const clean = path.replace(/\/+$/, "") || "/";
+  if (clean === "/")
+    return "example/src/pages/index.mdx";
+  if (indexRoutes.has(clean))
+    return `example/src/pages${clean}/index.mdx`;
+  return `example/src/pages${clean}.mdx`;
+}
+
 const { 
   currentPath, 
   lang = "zh",
-  editPath = `example/src/pages${currentPath}${currentPath.endsWith('/') ? 'index.mdx' : '.mdx'}`
+  editPath = defaultEditPath(currentPath)
 } = Astro.props;
 
 // Select the appropriate navigation based on language
@@ -104,14 +116,14 @@ const translations = {
     prevPage: "上一页",
     nextPage: "下一页",
     editOnGitHub: "在 GitHub 上编辑此页面",
-    projectInfo: "rehype-smart-links 项目",
+    projectInfo: "astro-smart-links 项目",
     copyright: "版权所有",
   },
   en: {
     prevPage: "Previous",
     nextPage: "Next",
     editOnGitHub: "Edit this page on GitHub",
-    projectInfo: "rehype-smart-links Project",
+    projectInfo: "astro-smart-links Project",
     copyright: "Copyright",
   },
 };

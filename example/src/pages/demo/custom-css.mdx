@@ -1,13 +1,13 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 import CodeExample from '../../components/CodeExample.astro'
-import '../../styles/custom.scss'
+import '../../styles/custom.css'
 
 <Layout title="CSS自定义样式" description="使用CSS自定义链接样式的示例" activeTab="custom-css">
 
 # CSS自定义样式
 
-本页面展示了如何使用CSS为不同类型的链接设置自定义样式。rehype-smart-links 为链接添加特定的类名，使您可以针对不同类型的链接应用不同的样式。
+本页面展示了如何使用CSS为不同类型的链接设置自定义样式。astro-smart-links 为链接添加特定的类名，使您可以针对不同类型的链接应用不同的样式。
 
 ## 自定义链接样式
 
@@ -22,7 +22,7 @@ import '../../styles/custom.scss'
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -39,10 +39,8 @@ export default defineConfig({
         contentClass: 'external-icon',
         
         // 外部链接属性
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -115,7 +113,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -230,7 +228,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -245,10 +243,8 @@ export default defineConfig({
         // 外部链接属性和图标
         content: { type: 'text', value: '↗' },
         contentClass: 'external-icon',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -338,7 +334,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -352,10 +348,8 @@ export default defineConfig({
         
         // 外部链接图标和属性
         contentClass: 'external-icon',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }

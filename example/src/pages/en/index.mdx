@@ -1,12 +1,12 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 
-<Layout title="rehype-smart-links" description="Add smart navigation and styling to your Markdown links" activeTab="home" lang="en">
+<Layout title="astro-smart-links" description="Add smart navigation and styling to your Markdown links" activeTab="home" lang="en">
 
 <div class="hero min-h-[60vh] bg-gradient-to-br from-primary/10 to-base-100 rounded-xl shadow-sm mb-12">
   <div class="hero-content text-center">
     <div class="max-w-3xl">
-      <h1 class="text-5xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary animate-fade-in">rehype-smart-links</h1>
+      <h1 class="text-5xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary animate-fade-in">astro-smart-links</h1>
       <p class="py-4 text-xl leading-relaxed opacity-90">Add smart navigation and styling to your Markdown links, easily distinguishing between internal links, broken links, and external links.</p>
 
       <div class="flex flex-wrap gap-4 mt-8 justify-center">
@@ -87,13 +87,13 @@ import PageNavigation from '../../components/PageNavigation.astro'
     
     ```bash
     # Using npm
-    npm install rehype-smart-links
+    npm install astro-smart-links
 
     # Using yarn
-    yarn add rehype-smart-links
+    yarn add astro-smart-links
 
     # Using pnpm
-    pnpm add rehype-smart-links
+    pnpm add astro-smart-links
     ```
   </div>
 </div>
@@ -106,7 +106,7 @@ import PageNavigation from '../../components/PageNavigation.astro'
     
     ```js
     import { defineConfig } from 'astro/config';
-    import rehypeSmartLinks from 'rehype-smart-links';
+    import { rehypeSmartLinks } from 'astro-smart-links';
 
     export default defineConfig({
       markdown: {
@@ -124,7 +124,7 @@ import PageNavigation from '../../components/PageNavigation.astro'
 
 <h2 class="text-center text-3xl font-bold mb-10">Compatible Frameworks</h2>
 
-<p class="text-center mb-8">rehype-smart-links can be used with any framework that processes Markdown using rehype:</p>
+<p class="text-center mb-8">astro-smart-links can be used with any framework that processes Markdown using rehype:</p>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-10">
   <div class="card bg-base-200 hover:bg-base-300 transition-colors">
@@ -148,7 +148,7 @@ import PageNavigation from '../../components/PageNavigation.astro'
 </div>
 
 <div class="alert alert-info shadow-lg my-12">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
     <div>
       <h3 class="font-bold">Want to learn more?</h3>
       <p class="text-sm">Check out the <a href="/en/about" class="link link-hover link-info font-semibold">About page</a> to learn more about how to use and configure the plugin.</p>

@@ -1,7 +1,8 @@
 ---
-import '../styles/global.scss';
+import '../styles/global.css';
 import { ClientRouter } from "astro:transitions";
 import LanguageToggle from '../components/LanguageToggle.astro';
+import { getEquivalentPath } from '../utils/i18n';
 
 export interface Props {
   title: string;
@@ -23,14 +24,14 @@ const currentPath = Astro.url.pathname;
 // Translations
 const translations = {
   zh: {
-    siteTitle: "rehype-smart-links",
-    siteDescription: "一个智能的Astro重构插件，让你的链接更加智能和美观",
+    siteTitle: "astro-smart-links",
+    siteDescription: "一个智能的 Astro 链接插件，让你的链接更加智能和美观",
     nav: {
       home: "首页",
       about: "关于",
       quickStart: "快速上手",
       installation: "安装指南",
-      routeScript: "路由脚本",
+      routeScript: "断链检查",
       demos: "演示",
       basicDemo: "基本演示",
       advancedFeatures: "高级功能",
@@ -49,14 +50,14 @@ const translations = {
     }
   },
   en: {
-    siteTitle: "rehype-smart-links",
-    siteDescription: "A smart Astro rehype plugin that makes your links more intelligent and beautiful",
+    siteTitle: "astro-smart-links",
+    siteDescription: "A smart Astro link plugin that makes your links more intelligent and beautiful",
     nav: {
       home: "Home",
       about: "About",
       quickStart: "Quick Start",
       installation: "Installation",
-      routeScript: "Route Script",
+      routeScript: "Broken Links",
       demos: "Demos",
       basicDemo: "Basic Demo",
       advancedFeatures: "Advanced Features",
@@ -81,11 +82,17 @@ const descriptionText = description || t.siteDescription;
 
 // Path prefix based on language
 const langPrefix = lang === "en" ? "/en" : "";
+
+// Absolute URLs for SEO
+const site = Astro.site ?? new URL(Astro.url.origin);
+const canonicalUrl = new URL(Astro.url.pathname, site);
+const ogImageUrl = new URL("/og-image.png", site);
+const zhUrl = new URL(getEquivalentPath(currentPath, "zh"), site);
+const enUrl = new URL(getEquivalentPath(currentPath, "en"), site);
 ---
 
-
 <!DOCTYPE html>
-<html lang={lang} data-theme="light">
+<html lang={lang}>
   <head>
     <ClientRouter />
     <meta charset="UTF-8" />
@@ -94,34 +101,47 @@ const langPrefix = lang === "en" ? "/en" : "";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title} | {t.siteTitle}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.theme = stored || (prefersDark ? "dark" : "light");
+        } catch {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+    <!-- Canonical / hreflang -->
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="zh-CN" href={zhUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={zhUrl} />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={descriptionText} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url} />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content={lang === "en" ? "en_US" : "zh_CN"} />
+    <meta property="og:locale:alternate" content={lang === "en" ? "zh_CN" : "en_US"} />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={descriptionText} />
-    <meta name="twitter:image" content="/og-image.png" />
-    <!-- Preload key assets -->
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" as="style">
+    <meta name="twitter:image" content={ogImageUrl} />
   </head>
   <body>
     <div class="drawer lg:drawer-open">
       <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
       
       <div class="drawer-content flex flex-col min-h-screen">
-        <!-- Language Toggle -->
-        <LanguageToggle currentPath={currentPath} currentLang={lang} />
-        
-        <!-- 顶部导航条 -->
+        <!-- 顶部导航条（移动端） -->
         <header class="navbar bg-base-100 shadow-sm sticky top-0 z-10 lg:hidden">
           <div class="navbar-start">
-            <label for="drawer-toggle" class="btn btn-square btn-ghost lg:hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+            <label for="drawer-toggle" class="btn btn-square btn-ghost lg:hidden" aria-label={lang === "en" ? "Open navigation" : "打开导航"}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </label>
@@ -129,30 +149,34 @@ const langPrefix = lang === "en" ? "/en" : "";
           <div class="navbar-center">
             <a href={`${langPrefix}/`} class="text-xl font-bold text-primary">{t.siteTitle}</a>
           </div>
-          <div class="navbar-end">
+          <div class="navbar-end gap-1">
+            <LanguageToggle currentPath={currentPath} currentLang={lang} class="hidden sm:flex" />
             <!-- 主题切换按钮 -->
-            <button id="theme-toggle" class="btn btn-circle btn-ghost">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 theme-icon-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button id="theme-toggle" class="btn btn-circle btn-ghost" aria-label={t.footer.toggleTheme} aria-pressed="false">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 theme-icon-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 theme-icon-dark hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 theme-icon-dark hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
             </button>
-            <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" class="btn btn-ghost btn-circle">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-circle" aria-label="GitHub">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
             </a>
           </div>
         </header>
+
+        <!-- 桌面端语言切换 -->
+        <LanguageToggle currentPath={currentPath} currentLang={lang} class="hidden lg:flex fixed top-4 right-4 z-20" />
         
         <!-- 主要内容 -->
         <main class="flex-grow container mx-auto">
           <!-- Two-column layout for non-homepage pages -->
           <div class={`flex flex-col lg:flex-row ${activeTab === 'home' ? '' : 'gap-8'}`}>
             <!-- Main content area -->
-            <div class={`prose w-full max-w-[80%]  ${activeTab === 'home' ? 'mx-auto p-4 lg:p-6' : 'lg:w-3/4 p-4 lg:p-6'}`}>
+            <div class={`prose w-full ${activeTab === 'home' ? 'mx-auto max-w-5xl p-4 lg:p-6' : 'lg:w-3/4 p-4 lg:p-6 max-w-none'}`}>
               <slot />
             </div>
             
@@ -160,8 +184,8 @@ const langPrefix = lang === "en" ? "/en" : "";
             {activeTab !== 'home' && (
               <div class="hidden lg:block lg:w-1/4 p-4 sticky top-20 self-start">
                 <div class="bg-base-200 rounded-lg p-5 shadow-sm">
-                  <h4 class="text-lg font-bold mb-3">{lang === 'en' ? 'Table of Contents' : '目录'}</h3>
-                  <div id="toc" class="toc-container">
+                  <h3 class="text-lg font-bold mb-3">{lang === 'en' ? 'Table of Contents' : '目录'}</h3>
+                  <div id="toc" class="toc-container" aria-label={lang === 'en' ? 'Table of contents' : '目录'}>
                     <!-- Table of contents will be injected here by client-side script -->
                     <div class="skeleton h-4 bg-base-300 mb-2 rounded"></div>
                     <div class="skeleton h-4 bg-base-300 mb-2 w-5/6 rounded"></div>
@@ -182,24 +206,24 @@ const langPrefix = lang === "en" ? "/en" : "";
           </div> 
           <div>
             <span class="footer-title">{t.footer.relatedLinks}</span> 
-            <a href="https://astro.build" target="_blank" class="link link-hover">Astro</a> 
-            <a href="https://tailwindcss.com" target="_blank" class="link link-hover">Tailwind CSS</a> 
-            <a href="https://daisyui.com" target="_blank" class="link link-hover">DaisyUI</a>
+            <a href="https://astro.build" target="_blank" rel="noopener noreferrer" class="link link-hover">Astro</a> 
+            <a href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" class="link link-hover">Tailwind CSS</a> 
+            <a href="https://daisyui.com" target="_blank" rel="noopener noreferrer" class="link link-hover">DaisyUI</a>
           </div> 
           <div>
             <span class="footer-title">{t.footer.resources}</span> 
-            <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" class="link link-hover">GitHub</a> 
-            <a href="https://www.npmjs.com/package/rehype-smart-links" target="_blank" class="link link-hover">NPM</a>
+            <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" rel="noopener noreferrer" class="link link-hover">GitHub</a> 
+            <a href="https://www.npmjs.com/package/astro-smart-links" target="_blank" rel="noopener noreferrer" class="link link-hover">NPM</a>
           </div>
           <div class="footer-end">
             <div class="grid grid-flow-col gap-4">
-              <a href="https://github.com/EveSunMaple/rehype-smart-links" class="text-base-content hover:text-primary transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" rel="noopener noreferrer" class="text-base-content hover:text-primary transition-colors" aria-label="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
                 </svg>
               </a> 
-              <a href="https://www.npmjs.com/package/rehype-smart-links" class="text-base-content hover:text-primary transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <a href="https://www.npmjs.com/package/astro-smart-links" target="_blank" rel="noopener noreferrer" class="text-base-content hover:text-primary transition-colors" aria-label="npm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M20.001 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm-3 4h-10v10h5V9.5h2.5V17h2.5z"></path>
                 </svg>
               </a> 
@@ -225,7 +249,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={langPrefix ? `${langPrefix}` : '/'} class={`menu-item ${activeTab === 'home' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                   {t.nav.home}
@@ -233,7 +257,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/about`} class={`menu-item ${activeTab === 'about' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {t.nav.about}
@@ -245,7 +269,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/quick-start`} class={`menu-item ${activeTab === 'quick-start' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   {t.nav.installation}
@@ -253,7 +277,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/quick-start/route-script`} class={`menu-item ${activeTab === 'route-script' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                   </svg>
                   {t.nav.routeScript}
@@ -265,7 +289,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/basic`} class={`menu-item ${activeTab === 'basic' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                   </svg>
                   {t.nav.basicDemo}
@@ -273,7 +297,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/advanced`} class={`menu-item ${activeTab === 'advanced' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   {t.nav.advancedFeatures}
@@ -281,7 +305,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/custom-icon`} class={`menu-item ${activeTab === 'custom-icon' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   {t.nav.customIcon}
@@ -289,7 +313,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/custom-css`} class={`menu-item ${activeTab === 'custom-css' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                   {t.nav.customCss}
@@ -297,7 +321,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/tailwind`} class={`menu-item ${activeTab === 'tailwind' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
                   {t.nav.tailwind}
@@ -305,7 +329,7 @@ const langPrefix = lang === "en" ? "/en" : "";
               </li>
               <li>
                 <a href={`${langPrefix}/demo/daisyui`} class={`menu-item ${activeTab === 'daisyui' ? 'active' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                   </svg>
                   {t.nav.daisyui}
@@ -316,16 +340,16 @@ const langPrefix = lang === "en" ? "/en" : "";
                 <span>{t.footer.resources}</span>
               </li>
               <li>
-                <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" class="menu-item">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <a href="https://github.com/EveSunMaple/rehype-smart-links" target="_blank" rel="noopener noreferrer" class="menu-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                   </svg>
                   GitHub
                 </a>
               </li>
               <li>
-                <a href="https://www.npmjs.com/package/rehype-smart-links" target="_blank" class="menu-item">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <a href="https://www.npmjs.com/package/astro-smart-links" target="_blank" rel="noopener noreferrer" class="menu-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M20.001 3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm-3 4h-10v10h5V9.5h2.5V17h2.5z"/>
                   </svg>
                   npm
@@ -338,11 +362,11 @@ const langPrefix = lang === "en" ? "/en" : "";
           <div class="bg-base-200 p-4 border-t border-base-300">
             <!-- 主题切换按钮 -->
             <div class="flex items-center gap-2 mb-2">
-              <button id="sidebar-theme-toggle" class="btn btn-sm btn-outline w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 theme-icon-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button id="sidebar-theme-toggle" class="btn btn-sm btn-outline w-full" aria-pressed="false">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 theme-icon-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 theme-icon-dark hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 theme-icon-dark hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
                 {t.footer.toggleTheme}
@@ -361,80 +385,85 @@ const langPrefix = lang === "en" ? "/en" : "";
     <script>
       // 主题切换功能
       document.addEventListener('astro:page-load', () => {
-        // 主题元素
         const html = document.documentElement;
         const themeToggles = document.querySelectorAll('#theme-toggle, #sidebar-theme-toggle');
         const lightIcons = document.querySelectorAll('.theme-icon-light');
         const darkIcons = document.querySelectorAll('.theme-icon-dark');
-        
-        // 检查本地存储中的主题
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
-        
-        // 添加点击事件监听器到所有主题切换按钮
-        themeToggles.forEach(toggle => {
-          toggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            setTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-          });
-        });
-        
-        // 设置主题和更新图标
-        function setTheme(theme) {
-          html.setAttribute('data-theme', theme);
-          if (theme === 'dark') {
-            lightIcons.forEach(icon => icon.classList.add('hidden'));
-            darkIcons.forEach(icon => icon.classList.remove('hidden'));
-          } else {
-            lightIcons.forEach(icon => icon.classList.remove('hidden'));
-            darkIcons.forEach(icon => icon.classList.add('hidden'));
-          }
+
+        function applyTheme(theme) {
+          html.dataset.theme = theme;
+          const isDark = theme === 'dark';
+          lightIcons.forEach(icon => icon.classList.toggle('hidden', isDark));
+          darkIcons.forEach(icon => icon.classList.toggle('hidden', !isDark));
+          themeToggles.forEach(toggle => toggle.setAttribute('aria-pressed', String(isDark)));
         }
 
-        // Generate table of contents for non-homepage pages
-        const isHomePage = document.querySelector('body')?.dataset?.page === 'home';
-        if (!isHomePage) {
-          const tocContainer = document.getElementById('toc');
-          if (tocContainer) {
-            const headers = Array.from(document.querySelectorAll('h2, h3'));
-            if (headers.length > 0) {
-              tocContainer.innerHTML = '';
-              const tocList = document.createElement('ul');
-              tocList.className = 'space-y-2 text-sm';
-              
-              headers.forEach((header, index) => {
-                const id = header.id || `header-${index}`;
-                if (!header.id) header.id = id;
-                
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = `#${id}`;
-                link.textContent = header.textContent || '';
-                link.className = header.tagName === 'H2' 
-                  ? 'block text-base-content hover:text-primary transition-colors' 
-                  : 'block text-base-content/80 hover:text-primary transition-colors pl-4 border-l border-base-300';
-                
-                listItem.appendChild(link);
-                tocList.appendChild(listItem);
-                
-                // Scroll to header when clicking TOC link
-                link.addEventListener('click', (e) => {
-                  e.preventDefault();
-                  const targetElement = document.querySelector(`#${id}`);
-                  if (targetElement) {
-                    targetElement.scrollIntoView({
-                      behavior: 'smooth'
-                    });
-                  }
-                });
-              });
-              
-              tocContainer.appendChild(tocList);
-            } else {
-              tocContainer.innerHTML = `<p class="text-base-content/70">${document.documentElement.lang === 'en' ? 'No headers found' : '没有找到标题'}</p>`;
+        applyTheme(html.dataset.theme || 'light');
+
+        themeToggles.forEach(toggle => {
+          toggle.addEventListener('click', () => {
+            const nextTheme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            try {
+              localStorage.setItem('theme', nextTheme);
+            } catch {
+              // Ignore storage errors (private mode, blocked cookies, ...)
             }
+          });
+        });
+
+        // Generate table of contents for documentation pages
+        const tocContainer = document.getElementById('toc');
+        if (tocContainer) {
+          const headings = Array.from(document.querySelectorAll('.prose h2, .prose h3'))
+            .filter(heading => !heading.closest('.not-prose'));
+
+          if (headings.length > 0) {
+            const usedIds = new Set();
+            const slugify = (text) => {
+              const base = text.toLowerCase().trim()
+                .replace(/[^\p{L}\p{N}]+/gu, '-')
+                .replace(/^-+|-+$/g, '') || 'section';
+              let slug = base;
+              let counter = 2;
+              while (usedIds.has(slug)) {
+                slug = `${base}-${counter++}`;
+              }
+              usedIds.add(slug);
+              return slug;
+            };
+
+            tocContainer.innerHTML = '';
+            const tocList = document.createElement('ul');
+            tocList.className = 'space-y-2 text-sm';
+
+            headings.forEach((heading) => {
+              if (!heading.id) {
+                heading.id = slugify(heading.textContent || '');
+              }
+
+              const listItem = document.createElement('li');
+              const link = document.createElement('a');
+              link.href = `#${heading.id}`;
+              link.textContent = heading.textContent || '';
+              link.className = heading.tagName === 'H2'
+                ? 'block text-base-content hover:text-primary transition-colors'
+                : 'block text-base-content/80 hover:text-primary transition-colors pl-4 border-l border-base-300';
+
+              link.addEventListener('click', (event) => {
+                event.preventDefault();
+                history.pushState(null, '', `#${heading.id}`);
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                heading.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+              });
+
+              listItem.appendChild(link);
+              tocList.appendChild(listItem);
+            });
+
+            tocContainer.appendChild(tocList);
+          } else {
+            tocContainer.innerHTML = `<p class="text-base-content/70">${document.documentElement.lang === 'en' ? 'No headers found' : '没有找到标题'}</p>`;
           }
         }
       });
@@ -451,14 +480,10 @@ const langPrefix = lang === "en" ? "/en" : "";
             try {
               await navigator.clipboard.writeText(code);
 
-              // Show success icon
               copyIcon.classList.add("hidden");
               successIcon.classList.remove("hidden");
-
-              // Add success animation
               button.classList.add("copy-success");
 
-              // Reset after animation
               setTimeout(() => {
                 copyIcon.classList.remove("hidden");
                 successIcon.classList.add("hidden");
@@ -472,4 +497,4 @@ const langPrefix = lang === "en" ? "/en" : "";
       });
     </script>
   </body>
-</html> 
+</html>

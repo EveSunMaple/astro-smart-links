@@ -1,11 +1,11 @@
 import Layout from '../layouts/Layout.astro'
 import PageNavigation from '../components/PageNavigation.astro'
 
-<Layout title="关于插件" description="了解 rehype-smart-links 的功能和设计理念" activeTab="about">
+<Layout title="关于插件" description="了解 astro-smart-links 的功能和设计理念" activeTab="about">
 
-# 关于 rehype-smart-links
+# 关于 astro-smart-links
 
-rehype-smart-links 是一个用于增强 Markdown 文档中链接的 rehype 插件。它通过添加智能导航和样式功能，帮助用户区分不同类型的链接，提升文档阅读体验。
+astro-smart-links 是一个用于增强 Markdown 文档中链接的 rehype 插件。它通过添加智能导航和样式功能，帮助用户区分不同类型的链接，提升文档阅读体验。
 
 ## 功能特点
 
@@ -41,13 +41,16 @@ rehype-smart-links 是一个用于增强 Markdown 文档中链接的 rehype 插�
 | `internalLinkClass` | `string` | `'internal-link'` | 内部链接的类名 |
 | `externalLinkClass` | `string` | `'external-link'` | 外部链接的类名 |
 | `brokenLinkClass` | `string` | `'broken-link'` | 断开链接的类名 |
-| `openExternal` | `boolean` | `true` | 是否在新标签页中打开外部链接 |
-| `internalLinks` | `string[]` | `[]` | 要标记为内部链接的特定域名列表 |
-| `includeFileExtensions` | `string[]` | `['md', 'html']` | 在路由检查中包含的文件扩展名 |
+| `target` | `string` | `'_blank'` | 外部链接的 target 属性 |
+| `rel` | `string` | `'noopener noreferrer'` | 外部链接的 rel 属性 |
+| `ignore` | `(string \| RegExp)[]` | `[]` | 不参与处理的链接 |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | 外部链接追加的图标内容 |
+| `routes` / `routesFile` / `publicDir` | — | — | 断链检测的路由来源（使用集成时自动获取） |
+| `failOnBroken` | `boolean` | `false` | 发现断链时中止构建（集成选项） |
 
 ## 使用场景
 
-rehype-smart-links 适用于各种使用 Markdown 的项目：
+astro-smart-links 适用于各种使用 Markdown 的项目：
 
 - **文档网站** - 提升文档导航体验
 - **博客平台** - 增强博客文章中的链接
@@ -55,7 +58,7 @@ rehype-smart-links 适用于各种使用 Markdown 的项目：
 
 ## 开始使用
 
-查看我们的 [快速上手](/quick-start) 指南，了解如何在你的项目中使用 rehype-smart-links。
+查看我们的 [快速上手](/quick-start) 指南，了解如何在你的项目中使用 astro-smart-links。
 
 ## 示例
 

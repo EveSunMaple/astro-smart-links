@@ -1,13 +1,13 @@
 import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 import CodeExample from '../../../components/CodeExample.astro'
-import '../../../styles/custom.scss'
+import '../../../styles/custom.css'
 
 <Layout title="CSS Custom Styles" description="Examples of customizing link styles with CSS" activeTab="custom-css" lang="en">
 
 # CSS Custom Styling
 
-This page demonstrates how to use CSS to customize styles for different types of links. rehype-smart-links adds specific class names to links, allowing you to apply different styles to different types of links.
+This page demonstrates how to use CSS to customize styles for different types of links. astro-smart-links adds specific class names to links, allowing you to apply different styles to different types of links.
 
 ## Custom Link Styles
 
@@ -23,7 +23,7 @@ You can style links with CSS:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -40,10 +40,8 @@ export default defineConfig({
         contentClass: 'external-icon',
         
         // External link attributes
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -117,7 +115,7 @@ You can also add tooltip effects to links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -233,7 +231,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -248,10 +246,8 @@ export default defineConfig({
         // External link attributes and icon
         content: { type: 'text', value: '↗' },
         contentClass: 'external-icon',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -341,7 +337,7 @@ You can define basic link styles in a global style file and apply these classes 
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -355,10 +351,8 @@ export default defineConfig({
         
         // External link icon and attributes
         contentClass: 'external-icon',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }

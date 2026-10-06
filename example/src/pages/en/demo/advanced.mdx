@@ -2,11 +2,11 @@ import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 import CodeExample from '../../../components/CodeExample.astro'
 
-<Layout title="Advanced Features" description="Advanced features and customization options demonstration for rehype-smart-links" activeTab="advanced" lang="en">
+<Layout title="Advanced Features" description="Advanced features and customization options demonstration for astro-smart-links" activeTab="advanced" lang="en">
 
 # Advanced Features Demo
 
-This page demonstrates the advanced features and customization options of the rehype-smart-links plugin.
+This page demonstrates the advanced features and customization options of the astro-smart-links plugin.
 
 ## Custom Link Structure
 
@@ -22,7 +22,7 @@ Using the `wrapperTemplate` option, you can customize the HTML structure of link
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -83,7 +83,7 @@ You can use wrapperTemplate to add different style badges to links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -129,7 +129,7 @@ export default defineConfig({
 
 ## Link Transformation Function
 
-Use the `transformLink` option to modify link attributes or content:
+Use `customInternalLinkTransform`, `customExternalLinkTransform` and `customBrokenLinkTransform` to modify nodes per link type. Each callback receives `(node, meta)`, where `meta.href` and `meta.pathname` describe the current link:
 
 <CodeExample
   title="Link Transformation Example"
@@ -141,46 +141,36 @@ Use the `transformLink` option to modify link attributes or content:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
     rehypePlugins: [[
-      rehypeSmartLinks, 
+      rehypeSmartLinks,
       {
-        transformLink: (node, linkType, url) => {
-          // Add specific attributes based on link type and URL
-          if (linkType === 'internal') {
-            // Redirect documentation links
-            if (url.startsWith('/docs/')) {
-              node.properties.href = url.replace('/docs/', '/documentation/');
-            }
-            
-            // Add data attributes
-            if (url.includes('getting-started')) {
-              node.properties['data-section'] = 'docs';
-            }
-          } 
-          else if (linkType === 'external') {
-            // Add extra attributes to external links
-            node.properties['data-external'] = 'true';
-            
-            // Add special class for specific sites
-            if (url.includes('github.com')) {
-              node.properties.className = [
-                ...(node.properties.className || []),
-                'github-link'
-              ];
-            }
+        customInternalLinkTransform: (node, meta) => {
+          // Add data attributes
+          if (meta.pathname?.includes('getting-started')) {
+            node.properties['data-section'] = 'docs';
           }
-          else if (linkType === 'broken') {
-            // Add error information to broken links
-            node.properties['data-error'] = 'true';
-            node.properties.title = 'This page does not exist';
+        },
+        customExternalLinkTransform: (node, meta) => {
+          // Custom transforms take over the link entirely, set attributes yourself
+          node.properties.target = '_blank';
+          node.properties.rel = 'noopener noreferrer';
+          node.properties['data-external'] = 'true';
+
+          if (meta.href.includes('github.com')) {
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'github-link'
+            ];
           }
-          
-          return node;
-        }
+        },
+        customBrokenLinkTransform: (node) => {
+          node.properties['data-error'] = 'true';
+          node.properties.title = 'This page does not exist';
+        },
       }
     ]]
   }
@@ -195,48 +185,39 @@ Here is a complete configuration example showing how to combine multiple customi
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
 export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // Basic style classes
-        internalLinkClass: 'custom-internal-link',
-        brokenLinkClass: 'custom-broken-link',
-        externalLinkClass: 'custom-external-link',
-        
-        // Routes file path (matching CLI generated path)
-        routesFile: './.smart-links-routes.json',
-        
-        // Whether to include all file types
-        includeAllFiles: true,
-        
-        // External link attributes
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          'data-external': 'true'
-        },
-        
-        // Custom link structure
-        wrapperTemplate: (node, linkType, url) => {
-          // Add icons and styles for different link types
-          // Implementation code...
-          return node;
-        },
-        
-        // Link transformation function
-        transformLink: (node, linkType, url) => {
-          // Modify link attributes based on URL or type
-          // Implementation code...
-          return node;
-        }
-      }
-    ]]
-  }
+  integrations: [
+    smartLinks({
+      // Basic style classes
+      internalLinkClass: 'custom-internal-link',
+      brokenLinkClass: 'custom-broken-link',
+      externalLinkClass: 'custom-external-link',
+
+      // External link attributes
+      target: '_blank',
+      rel: 'noopener noreferrer',
+
+      // The integration reads the route table from the build output,
+      // pass `routes` explicitly if you prefer
+      // routes: ['/', '/about'],
+
+      // Ignore drafts
+      ignore: ['/draft/'],
+
+      // Custom link structure
+      wrapperTemplate: (node, linkType, meta) => {
+        // Add icons and styles for different link types
+        // Implementation code...
+        return node;
+      },
+
+      // Broken link handling
+      failOnBroken: true,
+      reportFile: '.smart-links-report.json',
+    }),
+  ],
 });
 ```
 

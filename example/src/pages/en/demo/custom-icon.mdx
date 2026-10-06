@@ -1,12 +1,13 @@
 import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 import CodeExample from '../../../components/CodeExample.astro'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 
 <Layout title="Custom Icons" description="Using different navigation icons to beautify links" activeTab="custom-icon" lang="en">
 
 # Adding Custom Icons to Links
 
-This page demonstrates how to use the `wrapperTemplate` option of rehype-smart-links to add custom icons for different types of links.
+This page demonstrates how to use the `wrapperTemplate` option of astro-smart-links to add custom icons for different types of links.
 
 ## SVG Icon Examples
 
@@ -22,7 +23,7 @@ Using SVG icons to add visual cues for different types of links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -132,7 +133,7 @@ Add animation effects to icons to make links more interactive:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -239,7 +240,7 @@ You can also integrate Font Awesome or other icon libraries:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -300,7 +301,7 @@ You can dynamically select different icons based on the link destination URL:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({

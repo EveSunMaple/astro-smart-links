@@ -36,21 +36,21 @@ const t = translations[lang];
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
         <div class="bg-base-100 p-4 rounded-lg">
           <h4 class="font-semibold mb-2">{t.internalLink}</h4>
-          <div class="bg-white rounded p-3 min-h-12 flex items-center border border-gray-300 bg-pattern">
+          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
             <Fragment set:html={internalLinkHtml} />
           </div>
         </div>
         
         <div class="bg-base-100 p-4 rounded-lg">
           <h4 class="font-semibold mb-2">{t.externalLink}</h4>
-          <div class="bg-white rounded p-3 min-h-12 flex items-center border border-gray-300 bg-pattern">
+          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
             <Fragment set:html={externalLinkHtml} />
           </div>
         </div>
         
         <div class="bg-base-100 p-4 rounded-lg">
           <h4 class="font-semibold mb-2">{t.brokenLink}</h4>
-          <div class="bg-white rounded p-3 min-h-12 flex items-center border border-gray-300 bg-pattern">
+          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
             <Fragment set:html={brokenLinkHtml} />
           </div>
         </div>
@@ -64,6 +64,12 @@ const t = translations[lang];
 </div>
 <style>
 .bg-pattern {
-  background-image: repeating-linear-gradient(135deg, #d1d5db 9px, #d1d5db 10px, transparent 10px, transparent 20px);
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-base-content) 12%, transparent) 9px,
+    color-mix(in oklab, var(--color-base-content) 12%, transparent) 10px,
+    transparent 10px,
+    transparent 20px
+  );
 }
 </style>

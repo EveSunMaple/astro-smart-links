@@ -2,7 +2,7 @@
   "name": "example",
   "type": "module",
   "version": "1.0.0",
-  "description": "Example project for rehype-smart-links",
+  "description": "Example project for astro-smart-links",
   "author": "",
   "license": "MIT",
   "keywords": [],
@@ -10,25 +10,23 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "build:with-routes": "astro build && rehype-smart-links build && astro build",
-    "build:with-routes:local": "astro build && node ../dist/cli.js build && astro build",
+    "check": "astro-smart-links check dist",
     "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.2.3",
-    "@astrojs/tailwind": "^6.0.2",
+    "@astrojs/sitemap": "^3.2.1",
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.0",
     "astro": "^5.6.0",
-    "rehype-smart-links": "file:..",
-    "scss": "^0.2.4",
-    "tailwindcss": "^3.4.17"
+    "astro-smart-links": "workspace:*",
+    "daisyui": "^5.0.0",
+    "tailwindcss": "^4.1.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "daisyui": "^4.12.24",
     "eslint": "^9.23.0",
     "eslint-plugin-astro": "^1.3.1",
-    "eslint-plugin-format": "^1.0.1",
-    "sass-embedded": "^1.86.3"
+    "eslint-plugin-format": "^1.0.1"
   }
 }

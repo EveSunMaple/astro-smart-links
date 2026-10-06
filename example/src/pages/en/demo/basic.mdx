@@ -1,11 +1,11 @@
 import Layout from '../../../layouts/Layout.astro'
 import PageNavigation from '../../../components/PageNavigation.astro'
 
-<Layout title="Basic Demo" description="Basic functionality demonstration of rehype-smart-links" activeTab="basic" lang="en">
+<Layout title="Basic Demo" description="Basic functionality demonstration of astro-smart-links" activeTab="basic" lang="en">
 
 # Basic Functionality Demo
 
-This page demonstrates the basic functionality of rehype-smart-links. You can see how different types of links are processed and styled.
+This page demonstrates the basic functionality of astro-smart-links. You can see how different types of links are processed and styled.
 
 ## Internal Links
 
@@ -37,7 +37,7 @@ To enable these features, simply add the following code to your configuration fi
 ```js
 // Astro configuration example (astro.config.mjs)
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {

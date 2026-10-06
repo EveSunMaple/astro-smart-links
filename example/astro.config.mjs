@@ -1,38 +1,20 @@
 import mdx from "@astrojs/mdx";
-import tailwind from "@astrojs/tailwind";
+import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
-import rehypeSmartLinks from "rehype-smart-links";
+import { smartLinks } from "astro-smart-links";
 
 // https://astro.build/config
 export default defineConfig({
-  style: {
-    scss: {
-      includePaths: ["./src/styles"],
-    },
-  },
-  integrations: [mdx(), tailwind()],
+  site: "https://astro-smart-links.vercel.app",
+  integrations: [
+    mdx(),
+    sitemap(),
+    smartLinks({
+      reportFile: ".smart-links-report.json",
+    }),
+  ],
   markdown: {
-    rehypePlugins: [
-      // Basic usage (default settings)
-      rehypeSmartLinks,
-
-      // With custom options for markdown
-      /*
-      [
-        rehypeSmartLinks,
-        {
-          content: { type: 'text', value: '↗' },
-          internalLinkClass: 'internal-link',
-          externalLinkClass: 'external-link',
-          brokenLinkClass: 'broken-link',
-          contentClass: 'external-icon',
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          publicDir: './public',
-        }
-      ]
-      */
-    ],
     shikiConfig: {
       theme: "github-dark",
       transformers: [{
@@ -201,12 +183,6 @@ export default defineConfig({
     },
   },
   vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: "modern-compiler",
-        },
-      },
-    },
+    plugins: [tailwindcss()],
   },
 });

@@ -1,12 +1,13 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 import CodeExample from '../../components/CodeExample.astro'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 
 <Layout title="自定义图标" description="使用不同的跳转图标来美化链接" activeTab="custom-icon">
 
 # 为链接添加自定义图标
 
-本页面展示了如何使用 rehype-smart-links 的 `wrapperTemplate` 选项为不同类型的链接添加自定义图标。
+本页面展示了如何使用 astro-smart-links 的 `wrapperTemplate` 选项为不同类型的链接添加自定义图标。
 
 ## SVG 图标示例
 
@@ -21,7 +22,7 @@ import CodeExample from '../../components/CodeExample.astro'
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -130,7 +131,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -236,7 +237,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -296,7 +297,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({

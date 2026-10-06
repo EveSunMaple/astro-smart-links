@@ -6,7 +6,7 @@ import CodeExample from '../../components/CodeExample.astro'
 
 # 与 DaisyUI 集成
 
-[DaisyUI](https://daisyui.com/) 是一个基于 Tailwind CSS 的组件库，提供了丰富的 UI 组件。本页面展示如何将 rehype-smart-links 与 DaisyUI 组件集成，为链接添加漂亮的样式和交互效果。
+[DaisyUI](https://daisyui.com/) 是一个基于 Tailwind CSS 的组件库，提供了丰富的 UI 组件。本页面展示如何将 astro-smart-links 与 DaisyUI 组件集成，为链接添加漂亮的样式和交互效果。
 
 ## 基础按钮链接
 
@@ -21,7 +21,7 @@ import CodeExample from '../../components/CodeExample.astro'
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -31,10 +31,8 @@ export default defineConfig({
         internalLinkClass: 'btn btn-primary',
         externalLinkClass: 'btn btn-secondary',
         brokenLinkClass: 'btn btn-error',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -55,7 +53,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -154,7 +152,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -239,7 +237,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -249,10 +247,8 @@ export default defineConfig({
         internalLinkClass: 'badge badge-primary p-4',
         externalLinkClass: 'badge badge-secondary p-4',
         brokenLinkClass: 'badge badge-error p-4',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -273,7 +269,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -372,7 +368,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -382,10 +378,8 @@ export default defineConfig({
         internalLinkClass: 'link link-primary link-hover',
         externalLinkClass: 'link link-secondary link-hover',
         brokenLinkClass: 'link link-error link-hover',
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer'
-        }
+        target: '_blank',
+        rel: 'noopener noreferrer'
       }
     ]]
   }
@@ -406,7 +400,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({

@@ -2,11 +2,11 @@ import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 import CodeExample from '../../components/CodeExample.astro'
 
-<Layout title="高级功能" description="rehype-smart-links 高级功能和自定义选项演示" activeTab="advanced">
+<Layout title="高级功能" description="astro-smart-links 高级功能和自定义选项演示" activeTab="advanced">
 
 # 高级功能演示
 
-本页面展示了 rehype-smart-links 插件的高级功能和自定义选项。
+本页面展示了 astro-smart-links 插件的高级功能和自定义选项。
 
 ## 自定义链接结构
 
@@ -21,7 +21,7 @@ import CodeExample from '../../components/CodeExample.astro'
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -81,7 +81,7 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -127,7 +127,7 @@ export default defineConfig({
 
 ## 链接转换功能
 
-使用 `transformLink` 选项可以修改链接的属性或内容：
+使用 `customInternalLinkTransform`、`customExternalLinkTransform` 和 `customBrokenLinkTransform` 可以按链接类型修改节点；每个回调会收到 `(node, meta)`，其中 `meta.href`、`meta.pathname` 描述当前链接：
 
 <CodeExample
   title="链接转换示例"
@@ -138,46 +138,36 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
     rehypePlugins: [[
-      rehypeSmartLinks, 
+      rehypeSmartLinks,
       {
-        transformLink: (node, linkType, url) => {
-          // 根据链接类型和URL添加特定属性
-          if (linkType === 'internal') {
-            // 重定向文档链接
-            if (url.startsWith('/docs/')) {
-              node.properties.href = url.replace('/docs/', '/documentation/');
-            }
-            
-            // 添加数据属性
-            if (url.includes('getting-started')) {
-              node.properties['data-section'] = 'docs';
-            }
-          } 
-          else if (linkType === 'external') {
-            // 为外部链接添加额外属性
-            node.properties['data-external'] = 'true';
-            
-            // 为特定站点添加特殊类
-            if (url.includes('github.com')) {
-              node.properties.className = [
-                ...(node.properties.className || []),
-                'github-link'
-              ];
-            }
+        customInternalLinkTransform: (node, meta) => {
+          // 添加数据属性
+          if (meta.pathname?.includes('getting-started')) {
+            node.properties['data-section'] = 'docs';
           }
-          else if (linkType === 'broken') {
-            // 为断开链接添加错误信息
-            node.properties['data-error'] = 'true';
-            node.properties.title = '此页面不存在';
+        },
+        customExternalLinkTransform: (node, meta) => {
+          // 自定义转换会完全接管该类链接，需自行设置属性
+          node.properties.target = '_blank';
+          node.properties.rel = 'noopener noreferrer';
+          node.properties['data-external'] = 'true';
+
+          if (meta.href.includes('github.com')) {
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'github-link'
+            ];
           }
-          
-          return node;
-        }
+        },
+        customBrokenLinkTransform: (node) => {
+          node.properties['data-error'] = 'true';
+          node.properties.title = '此页面不存在';
+        },
       }
     ]]
   }
@@ -192,48 +182,38 @@ export default defineConfig({
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
 export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // 基本样式类
-        internalLinkClass: 'custom-internal-link',
-        brokenLinkClass: 'custom-broken-link',
-        externalLinkClass: 'custom-external-link',
-        
-        // 路由文件路径（与CLI生成路径一致）
-        routesFile: './.smart-links-routes.json',
-        
-        // 是否包含所有文件类型
-        includeAllFiles: true,
-        
-        // 外部链接属性
-        externalLinkAttributes: {
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          'data-external': 'true'
-        },
-        
-        // 自定义链接结构
-        wrapperTemplate: (node, linkType, url) => {
-          // 为各类链接添加图标和样式
-          // 实现代码...
-          return node;
-        },
-        
-        // 链接转换函数
-        transformLink: (node, linkType, url) => {
-          // 根据URL或类型修改链接属性
-          // 实现代码...
-          return node;
-        }
-      }
-    ]]
-  }
+  integrations: [
+    smartLinks({
+      // 基本样式类
+      internalLinkClass: 'custom-internal-link',
+      brokenLinkClass: 'custom-broken-link',
+      externalLinkClass: 'custom-external-link',
+
+      // 外部链接属性
+      target: '_blank',
+      rel: 'noopener noreferrer',
+
+      // 集成自动从构建产物获取路由，也可以显式提供
+      // routes: ['/', '/about'],
+
+      // 忽略草稿等链接
+      ignore: ['/draft/'],
+
+      // 自定义链接结构
+      wrapperTemplate: (node, linkType, meta) => {
+        // 为各类链接添加图标和样式
+        // 实现代码...
+        return node;
+      },
+
+      // 断链处理
+      failOnBroken: true,
+      reportFile: '.smart-links-report.json',
+    }),
+  ],
 });
 ```
 

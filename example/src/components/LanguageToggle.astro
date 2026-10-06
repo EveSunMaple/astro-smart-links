@@ -1,78 +1,32 @@
 ---
-// Props interface definition
-export interface Props {
+import { getEquivalentPath } from '../utils/i18n';
+
+interface Props {
   currentPath: string;
   currentLang: "zh" | "en";
+  class?: string;
 }
 
-const { currentPath, currentLang } = Astro.props;
+const { currentPath, currentLang, class: className = "" } = Astro.props;
 
-// Function to determine the equivalent path in the other language
-function getEquivalentPath(path: string, targetLang: string): string {
-  // Special case for home page
-  if (path === "/" && targetLang === "en") {
-    return "/en";
-  }
-  
-  if (path === "/en" && targetLang === "zh") {
-    return "/";
-  }
-  
-  // Remove trailing slash if present except for home page
-  const normalizedPath = path === "/" ? path : path.replace(/\/$/, "");
-  
-  if (currentLang === "zh" && targetLang === "en") {
-    // If we're on Chinese site going to English
-    return `/en${normalizedPath}`;
-  } else if (currentLang === "en" && targetLang === "zh") {
-    // If we're on English site going to Chinese
-    return normalizedPath.replace(/^\/en/, "");
-  }
-  
-  // Fallback to current path if something went wrong
-  return normalizedPath;
-}
+const targetLang = currentLang === "zh" ? "en" : "zh";
+const targetPath = getEquivalentPath(currentPath, targetLang);
 
-const toZhPath = getEquivalentPath(currentPath, "zh");
-const toEnPath = getEquivalentPath(currentPath, "en");
-
-// Translations
-const translations = {
-  zh: {
-    switchToEn: "English",
-    currentLang: "中文"
-  },
-  en: {
-    switchToZh: "中文",
-    currentLang: "English"
-  }
-};
-
-const t = translations[currentLang];
+const label = targetLang === "en" ? "English" : "中文";
+const title = targetLang === "en" ? "Switch to English" : "切换到中文";
 ---
 
-<div class="language-toggle fixed top-4 right-4 z-20 flex gap-2">
-  {currentLang === "zh" ? (
-    <a
-      href={toEnPath}
-      class="bg-base-200 hover:bg-base-300 text-base-content px-3 py-1 rounded-full text-sm flex items-center gap-1 transition-colors"
-      title="Switch to English"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-      </svg>
-      English
-    </a>
-  ) : (
-    <a
-      href={toZhPath}
-      class="bg-base-200 hover:bg-base-300 text-base-content px-3 py-1 rounded-full text-sm flex items-center gap-1 transition-colors"
-      title="切换到中文"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-      </svg>
-      中文
-    </a>
-  )}
+<div class={`language-toggle flex gap-2 ${className}`}>
+  <a
+    href={targetPath}
+    hreflang={targetLang}
+    class="bg-base-200 hover:bg-base-300 text-base-content px-3 py-1 rounded-full text-sm flex items-center gap-1 transition-colors"
+    title={title}
+    aria-label={title}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+    </svg>
+    {label}
+  </a>
 </div>

@@ -1,11 +1,11 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 
-<Layout title="安装指南" description="快速上手使用rehype-smart-links插件" activeTab="quick-start">
+<Layout title="安装指南" description="快速上手使用 astro-smart-links 插件" activeTab="quick-start">
 
 # 快速上手指南
 
-rehype-smart-links 是一个为 Markdown 链接添加智能功能的 rehype 插件。本指南将帮助你快速安装和配置插件。
+astro-smart-links 是一个 Astro 集成，可以为 Markdown 中的内部链接、断开的内部链接和外部链接添加不同的样式，并在构建结束时检查断链。
 
 ## 安装
 
@@ -13,82 +13,66 @@ rehype-smart-links 是一个为 Markdown 链接添加智能功能的 rehype 插�
 
 ```bash
 # 使用 npm
-npm install rehype-smart-links
+npm install astro-smart-links
 
 # 使用 yarn
-yarn add rehype-smart-links
+yarn add astro-smart-links
 
 # 使用 pnpm
-pnpm add rehype-smart-links
+pnpm add astro-smart-links
 ```
 
 ## 基础配置
 
-### 在 Astro 中使用
-
-在 `astro.config.mjs` 文件中添加插件：
+在 `astro.config.mjs` 中注册集成：
 
 ```js
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
 export default defineConfig({
-  markdown: {
-    rehypePlugins: [
-      // 基本用法（默认设置）
-      rehypeSmartLinks,
-      
-      // 或使用自定义选项
-      [rehypeSmartLinks, {
-        internalLinkClass: 'internal-link',
-        brokenLinkClass: 'broken-link',
-        externalLinkClass: 'external-link',
-        routesFile: './.smart-links-routes.json', // 路由文件路径
-        includeAllFiles: false,  // 是否包含所有文件类型
-      }]
-    ]
-  }
+  integrations: [
+    smartLinks({
+      internalLinkClass: 'internal-link',
+      externalLinkClass: 'external-link',
+      brokenLinkClass: 'broken-link',
+    }),
+  ],
 });
 ```
 
-### 在 Next.js 中使用
+构建时集成会：
 
-在 Next.js 项目中，你可以使用 MDX 和 rehype 插件：
+1. 为外部链接添加类名、`target`、`rel` 和图标。
+2. 为内部链接添加 `internal-link` 类名。
+3. 构建完成后使用真实路由表校验所有内部链接，为断链添加 `broken-link` 类名并输出报告。
+
+**不再需要二次构建或路由脚本。** 之前的 `astro build && rehype-smart-links build && astro build` 流程已被移除。
+
+### 让断链检查失败并中止构建
 
 ```js
-// next.config.js
-const withMDX = require('@next/mdx')({
-  options: {
-    rehypePlugins: [
-      require('rehype-smart-links')
-    ]
-  }
-})
-
-module.exports = withMDX({
-  pageExtensions: ['js', 'jsx', 'md', 'mdx'],
-})
+smartLinks({
+  failOnBroken: true,
+  reportFile: '.smart-links-report.json',
+}),
 ```
 
-### 在 Gatsby 中使用
+## 在非 Astro 项目中使用
 
-在 Gatsby 项目中配置：
+如果项目使用 rehype 处理 Markdown（Next.js、Gatsby 等），可以使用具名导出的 rehype 插件。此时需要自行提供路由信息：
 
 ```js
-// gatsby-config.js
+const { rehypeSmartLinks } = require('astro-smart-links');
+
 module.exports = {
-  plugins: [
-    {
-      resolve: `gatsby-plugin-mdx`,
-      options: {
-        rehypePlugins: [
-          require('rehype-smart-links')
-        ],
-      },
-    },
+  rehypePlugins: [
+    [rehypeSmartLinks, { routes: ['/', '/about'] }],
   ],
-}
+};
 ```
+
+路由来源三选一：`routes`（数组）、`routesFile`（JSON 文件）或 `publicDir`（构建目录）。都不提供时，所有内部链接都会被视为有效链接，只做样式标记。
 
 ## 添加样式
 
@@ -107,24 +91,7 @@ module.exports = {
   position: relative;
 }
 
-.internal-link::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 1px;
-  bottom: -2px;
-  left: 0;
-  background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-}
-
-.internal-link:hover::after {
-  transform: scaleX(1);
-}
-
-/* 断开链接样式 */
+/* 断开链接样式（类似维基百科的红链） */
 .broken-link {
   color: #ef4444;
   text-decoration: line-through;
@@ -134,38 +101,39 @@ module.exports = {
 /* 外部链接样式 */
 .external-link {
   color: #10b981;
-  position: relative;
-  padding-right: 1.2em;
 }
 
-.external-link::after {
-  content: '↗';
-  position: absolute;
-  right: 0;
-  font-size: 0.8em;
+.external-link .external-icon {
+  margin-left: 0.25em;
+  font-size: 0.75em;
+  opacity: 0.8;
 }
 ```
 
-## 高级配置选项
-
-rehype-smart-links 提供了多种配置选项：
+## 主要配置选项
 
 | 选项 | 类型 | 默认值 | 描述 |
 |------|------|--------|------|
-| `internalLinkClass` | `string` | `'internal-link'` | 应用于内部链接的 CSS 类 |
-| `brokenLinkClass` | `string` | `'broken-link'` | 应用于断开链接的 CSS 类 |
-| `externalLinkClass` | `string` | `'external-link'` | 应用于外部链接的 CSS 类 |
-| `content` | `object` | `{ type: 'text', value: '↗' }` | 添加到外部链接的内容 |
-| `contentClass` | `string` | `'external-icon'` | 应用于外部链接图标的 CSS 类 |
-| `routesFile` | `string` | `'./.smart-links-routes.json'` | 路由映射文件的路径（应与CLI生成的位置匹配） |
-| `includeAllFiles` | `boolean` | `false` | 是否包含所有文件在路由检查中 |
-| `target` | `string` | `'_blank'` | 外部链接的 target 属性 |
-| `rel` | `string` | `'noopener noreferrer'` | 外部链接的 rel 属性 |
-| `externalLinkAttributes` | `object` | `{ target: '_blank', rel: 'noopener noreferrer' }` | 应用于外部链接的 HTML 属性 |
-| `wrapperTemplate` | `function` | | 自定义链接包装模板函数 |
+| `internalLinkClass` | `string` | `'internal-link'` | 内部链接的 CSS 类 |
+| `externalLinkClass` | `string` | `'external-link'` | 外部链接的 CSS 类 |
+| `brokenLinkClass` | `string` | `'broken-link'` | 断开链接的 CSS 类 |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | 外部链接追加的内容，设为 `null` 可禁用图标 |
+| `contentClass` | `string` | `'external-icon'` | 外部链接图标的 CSS 类 |
+| `target` / `rel` | `string` | `'_blank'` / `'noopener noreferrer'` | 外部链接属性 |
+| `ignore` | `(string \| RegExp)[]` | `[]` | 不处理这些链接（前缀匹配或正则） |
+| `routes` | `string[]` | — | 显式路由列表 |
+| `routesFile` | `string` | — | 路由 JSON 文件路径 |
+| `publicDir` | `string` | — | 扫描路由的构建目录 |
+| `base` | `string` | Astro 配置中的 `base` | 站点子路径 |
+| `wrapperTemplate` | `function` | — | 完全自定义链接的 HTML 结构 |
+| `customInternalLinkTransform` | `function` | — | 内部链接的自定义转换 |
+| `customExternalLinkTransform` | `function` | — | 外部链接的自定义转换 |
+| `customBrokenLinkTransform` | `function` | — | 断链的自定义转换 |
+| `failOnBroken` | `boolean` | `false` | 集成选项：发现断链时让构建失败 |
+| `reportFile` | `string` | — | 集成选项：将报告写入文件（`.json` 或 `.html`） |
 
 查看 [高级演示](/demo/advanced) 获取更多自定义选项的示例。
 
 <PageNavigation currentPath="/quick-start" />
 
-</Layout> 
+</Layout>

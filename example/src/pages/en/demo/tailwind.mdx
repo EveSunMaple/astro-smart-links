@@ -6,11 +6,11 @@ import CodeExample from '../../../components/CodeExample.astro'
 
 # Tailwind CSS Style Integration
 
-This page demonstrates how to use Tailwind CSS to customize links processed by the rehype-smart-links plugin.
+This page demonstrates how to use Tailwind CSS to customize links processed by the astro-smart-links plugin.
 
 ## Basic Tailwind Integration
 
-The simplest way to use Tailwind with rehype-smart-links is to add Tailwind classes directly:
+The simplest way to use Tailwind with astro-smart-links is to add Tailwind classes directly:
 
 <CodeExample
   title="Basic Tailwind Classes"
@@ -22,7 +22,7 @@ The simplest way to use Tailwind with rehype-smart-links is to add Tailwind clas
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -53,7 +53,7 @@ Create more sophisticated link styles with Tailwind's utility classes:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
@@ -84,7 +84,7 @@ Add icons to your links using Tailwind's flex utilities:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -200,7 +200,7 @@ Create eye-catching animations for your links using Tailwind's transition utilit
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -300,15 +300,15 @@ Create card-style links for more prominent navigation options:
 
 <CodeExample
   title="Tailwind Card Links"
-  internalLinkHtml='<a href="/about" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200"><div class="flex items-center"><div class="flex-shrink-0 bg-blue-100 p-2 rounded-lg"><svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">About Page</h3><p class="text-xs text-gray-500">Learn more about our project</p></div></div></a>'
-  externalLinkHtml='<a href="https://github.com" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200" target="_blank" rel="noopener noreferrer"><div class="flex items-center"><div class="flex-shrink-0 bg-purple-100 p-2 rounded-lg"><svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">GitHub Repository</h3><p class="text-xs text-gray-500">View source code (opens in new tab)</p></div></div></a>'
-  brokenLinkHtml='<a href="/non-existent" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm opacity-75 cursor-not-allowed"><div class="flex items-center"><div class="flex-shrink-0 bg-red-100 p-2 rounded-lg"><svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900 line-through">Broken Link</h3><p class="text-xs text-red-500">This page does not exist</p></div></div></a>'
+  internalLinkHtml='<a href="/about" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200"><div class="flex items-center"><div class="shrink-0 bg-blue-100 p-2 rounded-lg"><svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">About Page</h3><p class="text-xs text-gray-500">Learn more about our project</p></div></div></a>'
+  externalLinkHtml='<a href="https://github.com" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200" target="_blank" rel="noopener noreferrer"><div class="flex items-center"><div class="shrink-0 bg-purple-100 p-2 rounded-lg"><svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">GitHub Repository</h3><p class="text-xs text-gray-500">View source code (opens in new tab)</p></div></div></a>'
+  brokenLinkHtml='<a href="/non-existent" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm opacity-75 cursor-not-allowed"><div class="flex items-center"><div class="shrink-0 bg-red-100 p-2 rounded-lg"><svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900 line-through">Broken Link</h3><p class="text-xs text-red-500">This page does not exist</p></div></div></a>'
   lang="en"
 >
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -337,7 +337,7 @@ export default defineConfig({
               })
             ]);
             
-            container = h('div', { class: 'flex-shrink-0 bg-blue-100 p-2 rounded-lg' }, [icon]);
+            container = h('div', { class: 'shrink-0 bg-blue-100 p-2 rounded-lg' }, [icon]);
             title = h('h3', { class: 'text-sm font-medium text-gray-900' }, [originalText]);
             description = h('p', { class: 'text-xs text-gray-500' }, ['Learn more about our project']);
             
@@ -371,7 +371,7 @@ export default defineConfig({
               })
             ]);
             
-            container = h('div', { class: 'flex-shrink-0 bg-purple-100 p-2 rounded-lg' }, [icon]);
+            container = h('div', { class: 'shrink-0 bg-purple-100 p-2 rounded-lg' }, [icon]);
             title = h('h3', { class: 'text-sm font-medium text-gray-900' }, [originalText]);
             description = h('p', { class: 'text-xs text-gray-500' }, ['View source code (opens in new tab)']);
             
@@ -405,7 +405,7 @@ export default defineConfig({
               })
             ]);
             
-            container = h('div', { class: 'flex-shrink-0 bg-red-100 p-2 rounded-lg' }, [icon]);
+            container = h('div', { class: 'shrink-0 bg-red-100 p-2 rounded-lg' }, [icon]);
             title = h('h3', { class: 'text-sm font-medium text-gray-900 line-through' }, [originalText]);
             description = h('p', { class: 'text-xs text-red-500' }, ['This page does not exist']);
             
@@ -452,26 +452,24 @@ Create links that work well in both light and dark modes with Tailwind's dark mo
   lang="en"
 >
 ```js
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class', // or 'media' if you prefer system preferences
-  // other tailwind configuration...
-}
+// global.css (Tailwind CSS 4 is configured in CSS)
+// Dark mode follows the `data-theme` attribute by default with daisyUI,
+// or add a custom variant for class-based dark mode:
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 
 export default defineConfig({
   markdown: {
     rehypePlugins: [[
       rehypeSmartLinks, 
       {
-        className: {
-          internal: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline',
-          external: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline',
-          broken: 'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through'
-        }
+        internalLinkClass: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline',
+        externalLinkClass: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline',
+        brokenLinkClass: 'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through',
       }
     ]]
   }
@@ -493,7 +491,7 @@ Use Tailwind to create custom tooltips for your links:
 ```js
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
-import rehypeSmartLinks from 'rehype-smart-links';
+import { rehypeSmartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 export default defineConfig({
@@ -551,7 +549,7 @@ export default defineConfig({
 Explore more styling options:
 
 - [Basic Demo](/en/demo/basic) - Simple link styling examples
-- [DaisyUI Styles](/en/demo/daisyui) - Using DaisyUI components with rehype-smart-links
+- [DaisyUI Styles](/en/demo/daisyui) - Using DaisyUI components with astro-smart-links
 - [Custom CSS](/en/demo/custom-css) - Advanced CSS styling techniques
 
 <PageNavigation currentPath="/en/demo/tailwind" lang="en" />

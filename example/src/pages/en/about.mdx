@@ -1,11 +1,11 @@
 import Layout from '../../layouts/Layout.astro'
 import PageNavigation from '../../components/PageNavigation.astro'
 
-<Layout title="About the Plugin" description="Learn about the features and design philosophy of rehype-smart-links" activeTab="about" lang="en">
+<Layout title="About the Plugin" description="Learn about the features and design philosophy of astro-smart-links" activeTab="about" lang="en">
 
-# About rehype-smart-links
+# About astro-smart-links
 
-rehype-smart-links is a rehype plugin designed to enhance links in Markdown documents. It adds smart navigation and styling features to help users distinguish between different types of links, improving the document reading experience.
+astro-smart-links is a rehype plugin designed to enhance links in Markdown documents. It adds smart navigation and styling features to help users distinguish between different types of links, improving the document reading experience.
 
 ## Features
 
@@ -41,13 +41,16 @@ The plugin provides a rich set of customization options that allow you to adjust
 | `internalLinkClass` | `string` | `'internal-link'` | Class name for internal links |
 | `externalLinkClass` | `string` | `'external-link'` | Class name for external links |
 | `brokenLinkClass` | `string` | `'broken-link'` | Class name for broken links |
-| `openExternal` | `boolean` | `true` | Whether to open external links in a new tab |
-| `internalLinks` | `string[]` | `[]` | List of specific domains to mark as internal links |
-| `includeFileExtensions` | `string[]` | `['md', 'html']` | File extensions to include in route checking |
+| `target` | `string` | `'_blank'` | Target attribute for external links |
+| `rel` | `string` | `'noopener noreferrer'` | Rel attribute for external links |
+| `ignore` | `(string \| RegExp)[]` | `[]` | Links that are never processed |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | Icon content appended to external links |
+| `routes` / `routesFile` / `publicDir` | — | — | Route sources for broken-link detection (automatic when using the integration) |
+| `failOnBroken` | `boolean` | `false` | Fail the build on broken links (integration option) |
 
 ## Use Cases
 
-rehype-smart-links is suitable for various projects using Markdown:
+astro-smart-links is suitable for various projects using Markdown:
 
 - **Documentation Sites** - Enhance document navigation experience
 - **Blog Platforms** - Improve link usability in blog posts
@@ -55,7 +58,7 @@ rehype-smart-links is suitable for various projects using Markdown:
 
 ## Getting Started
 
-Check out our [Quick Start](/en/quick-start) guide to learn how to use rehype-smart-links in your project.
+Check out our [Quick Start](/en/quick-start) guide to learn how to use astro-smart-links in your project.
 
 ## Examples
 
