@@ -7,70 +7,62 @@ import { afterAll, describe, expect, it } from "vitest";
 import testCases from "./cases/testCases";
 import { generateHTMLReport, runTest } from "./utils/testRunner";
 
-describe("rehype-smart-links", () => {
-  // Log the number of test cases
-  console.warn(`Running ${testCases.length} test cases`);
+function buildDiffMessage(result: TestResult): string {
+  const lines = [`Test "${result.title}" (${result.id}) did not match the expected output.`];
 
-  // Store test results
+  if (result.actualInternal !== result.expectedInternalLinkHtml) {
+    lines.push(
+      "Internal link:",
+      `  expected: ${result.expectedInternalLinkHtml}`,
+      `  actual:   ${result.actualInternal}`,
+    );
+  }
+
+  if (result.actualExternal !== result.expectedExternalLinkHtml) {
+    lines.push(
+      "External link:",
+      `  expected: ${result.expectedExternalLinkHtml}`,
+      `  actual:   ${result.actualExternal}`,
+    );
+  }
+
+  if (result.actualBroken !== result.expectedBrokenLinkHtml) {
+    lines.push(
+      "Broken link:",
+      `  expected: ${result.expectedBrokenLinkHtml}`,
+      `  actual:   ${result.actualBroken}`,
+    );
+  }
+
+  if (result.error) {
+    lines.push(`Error: ${result.error}`);
+  }
+
+  return lines.join("\n");
+}
+
+describe("rehype-smart-links", () => {
   const testResults: TestResult[] = [];
 
-  // Test each case
   it.each(testCases)("$title", async (testCase) => {
-    // Run the test
     const result = await runTest(testCase);
     testResults.push(result);
 
-    // Assert based on test result
-    if (result.status === "error") {
-      console.warn(`❌ Test "${result.title}" encountered an error: ${result.error}`);
-      expect(result.error).toBeUndefined();
-    }
-    else if (result.status === "failure") {
-      // Change message to indicate warning instead of failure
-      console.warn(`⚠️ Test "${result.title}" output needs attention:`);
-
-      if (result.actualInternal !== result.expectedInternalLinkHtml) {
-        console.warn(`  - Internal link differences found`);
-        console.warn(`    Expected: ${result.expectedInternalLinkHtml}`);
-        console.warn(`    Actual: ${result.actualInternal}`);
-      }
-
-      if (result.actualExternal !== result.expectedExternalLinkHtml) {
-        console.warn(`  - External link differences found`);
-        console.warn(`    Expected: ${result.expectedExternalLinkHtml}`);
-        console.warn(`    Actual: ${result.actualExternal}`);
-      }
-
-      if (result.actualBroken !== result.expectedBrokenLinkHtml) {
-        console.warn(`  - Broken link differences found`);
-        console.warn(`    Expected: ${result.expectedBrokenLinkHtml}`);
-        console.warn(`    Actual: ${result.actualBroken}`);
-      }
-
-      // For now, we'll mark this as passing
-      expect(true).toBe(true);
-    }
-    else {
-      console.warn(`✔️ Test "${result.title}" succeeded!`);
-      expect(result.status).toBe("success");
-    }
+    expect(result.status, buildDiffMessage(result)).toBe("success");
   });
 
-  // Generate HTML report after all tests
   afterAll(() => {
+    if (testResults.length === 0)
+      return;
+
     const reportPath = path.join(process.cwd(), "tests/results/report.html");
     generateHTMLReport(testResults, reportPath);
-    console.warn(`📊 HTML test report generated: ${reportPath}`);
 
-    // Summary
-    const successes = testResults.filter(r => r.status === "success").length;
-    const failures = testResults.filter(r => r.status === "failure").length;
-    const errors = testResults.filter(r => r.status === "error").length;
+    const successes = testResults.filter((r) => r.status === "success").length;
+    const failures = testResults.filter((r) => r.status === "failure").length;
+    const errors = testResults.filter((r) => r.status === "error").length;
 
-    console.warn(`\n📝 Test summary:`);
-    console.warn(`✔️ Success: ${successes}`);
-    console.warn(`⚠️ Warning: ${failures}`);
-    console.warn(`❌ Error: ${errors}`);
-    console.warn(`📊 Total: ${testResults.length}`);
+    console.warn(`\nTest summary: ${successes} passed, ${failures} failed, ${errors} errors, ${testResults.length} total`);
+    console.warn(`HTML report: ${reportPath}`);
   });
 });

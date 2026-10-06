@@ -253,9 +253,9 @@ const testCases: TestCase[] = [
     internalLinkHtml: "<a href=\"/internal-link\">Internal Link</a>",
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
-    expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"internal-link flex items-center gap-1 group\">Internal Link<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:scale-125 transition-transform\"><path d=\"M5 12h14\"></path><path d=\"m12 5 7 7-7 7\"></path></svg></a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"external-link flex items-center gap-1 group\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform\"><line x1=\"7\" y1=\"17\" x2=\"17\" y2=\"7\"></line><polyline points=\"7 7 17 7 17 17\"></polyline></svg></a>",
-    expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"broken-link flex items-center gap-1 group\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:rotate-12 transition-transform text-red-500\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>Broken Link</a>",
+    expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"flex items-center gap-1 group\">Internal Link<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:scale-125 transition-transform\"><path d=\"M5 12h14\"></path><path d=\"M12 5L19 12L12 19\"></path></svg></a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"flex items-center gap-1 group\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform\"><line x1=\"7\" y1=\"17\" x2=\"17\" y2=\"7\"></line><polyline points=\"7 7 17 7 17 17\"></polyline></svg></a>",
+    expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"flex items-center gap-1 group\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"icon-animate group-hover:rotate-12 transition-transform text-red-500\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>Broken Link</a>",
     pluginConfig: {
       wrapperTemplate: (node, linkType) => {
         let icon;
@@ -347,9 +347,9 @@ const testCases: TestCase[] = [
     internalLinkHtml: "<a href=\"/internal-link\">Internal Link</a>",
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
-    expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"internal-link flex items-center gap-2\">Internal Link<i class=\"fa fa-book\"></i></a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"external-link flex items-center gap-2\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<i class=\"fa fa-external-link\"></i></a>",
-    expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"broken-link flex items-center gap-2\"><i class=\"fa fa-exclamation-triangle\"></i>Broken Link</a>",
+    expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"flex items-center gap-2\">Internal Link<i class=\"fa fa-book\"></i></a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"flex items-center gap-2\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<i class=\"fa fa-external-link\"></i></a>",
+    expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"flex items-center gap-2\"><i class=\"fa fa-exclamation-triangle\"></i>Broken Link</a>",
     pluginConfig: {
       wrapperTemplate: (node, linkType) => {
         let iconClass;
@@ -399,7 +399,7 @@ const testCases: TestCase[] = [
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
     expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"badge badge-primary\">Internal Link</a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"badge badge-secondary\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"badge badge-secondary\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<span class=\"external-icon\">↗</span></a>",
     expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"badge badge-error\">Broken Link</a>",
     pluginConfig: {
 
@@ -418,7 +418,7 @@ const testCases: TestCase[] = [
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
     expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"btn btn-primary btn-sm\">Internal Link</a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"btn btn-secondary btn-sm\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"btn btn-secondary btn-sm\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<span class=\"external-icon\">↗</span></a>",
     expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"btn btn-error btn-sm\">Broken Link</a>",
     pluginConfig: {
       internalLinkClass: "btn btn-primary btn-sm",
@@ -436,7 +436,7 @@ const testCases: TestCase[] = [
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
     expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"link link-primary\">Internal Link</a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"link link-secondary\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"link link-secondary\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<span class=\"external-icon\">↗</span></a>",
     expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"link link-error\">Broken Link</a>",
     pluginConfig: {
       internalLinkClass: "link link-primary",
@@ -506,7 +506,7 @@ const testCases: TestCase[] = [
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
     expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"text-blue-600 hover:text-blue-800 underline\">Internal Link</a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"text-purple-600 hover:text-purple-800 underline\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"text-purple-600 hover:text-purple-800 underline\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<span class=\"external-icon\">↗</span></a>",
     expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"text-red-600 hover:text-red-800 line-through\">Broken Link</a>",
     pluginConfig: {
       internalLinkClass: "text-blue-600 hover:text-blue-800 underline",
@@ -525,7 +525,7 @@ const testCases: TestCase[] = [
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
     expectedInternalLinkHtml: "<a href=\"/internal-link\" class=\"inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200\">Internal Link</a>",
-    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a>",
+    expectedExternalLinkHtml: "<a href=\"https://example.com\" class=\"inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200\" target=\"_blank\" rel=\"noopener noreferrer\">External Link<span class=\"external-icon\">↗</span></a>",
     expectedBrokenLinkHtml: "<a href=\"/broken-link\" class=\"inline-flex items-center px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 line-through opacity-75 cursor-not-allowed\">Broken Link</a>",
     pluginConfig: {
       internalLinkClass: "inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200",
@@ -643,9 +643,9 @@ const testCases: TestCase[] = [
     internalLinkHtml: "<a href=\"/internal-link\">Internal Link</a>",
     externalLinkHtml: "<a href=\"https://example.com\">External Link</a>",
     brokenLinkHtml: "<a href=\"/broken-link\">Broken Link</a>",
-    expectedInternalLinkHtml: "<span class=\"group relative\"><a href=\"/internal-link\" class=\"text-blue-600 hover:text-blue-800 group-hover:underline\">Internal Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[\"\"] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Internal page</span></span>",
-    expectedExternalLinkHtml: "<span class=\"group relative\"><a href=\"https://example.com\" class=\"text-purple-600 hover:text-purple-800 group-hover:underline\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-32 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[\"\"] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Opens in new tab</span></span>",
-    expectedBrokenLinkHtml: "<span class=\"group relative\"><a href=\"/broken-link\" class=\"text-red-600 hover:text-red-800 line-through cursor-not-allowed\">Broken Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[\"\"] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Link not found</span></span>",
+    expectedInternalLinkHtml: "<span class=\"group relative\"><a href=\"/internal-link\" class=\"text-blue-600 hover:text-blue-800 group-hover:underline\">Internal Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[&quot;&quot;] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Internal page</span></span>",
+    expectedExternalLinkHtml: "<span class=\"group relative\"><a href=\"https://example.com\" class=\"text-purple-600 hover:text-purple-800 group-hover:underline\" target=\"_blank\" rel=\"noopener noreferrer\">External Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-32 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[&quot;&quot;] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Opens in new tab</span></span>",
+    expectedBrokenLinkHtml: "<span class=\"group relative\"><a href=\"/broken-link\" class=\"text-red-600 hover:text-red-800 line-through cursor-not-allowed\">Broken Link</a><span class=\"invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[&quot;&quot;] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900\">Link not found</span></span>",
     pluginConfig: {
       wrapperTemplate: (node, linkType) => {
         // Set link styles based on type

@@ -5,7 +5,7 @@ import path from "node:path";
 
 import * as cheerio from "cheerio";
 import rehypeParse from "rehype-parse";
-import rehypeSmartLinks from "rehype-smart-links";
+import { rehypeSmartLinks } from "rehype-smart-links";
 import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
 
@@ -67,9 +67,15 @@ export async function runTest(testCase: TestCase): Promise<TestResult> {
     `;
 
     try {
+      const pluginConfig = {
+        routes: ["/internal-link"],
+        logger: false as const,
+        ...testCase.pluginConfig,
+      };
+
       const file = await unified()
         .use(rehypeParse)
-        .use(rehypeSmartLinks, testCase.pluginConfig)
+        .use(rehypeSmartLinks, pluginConfig)
         .use(rehypeStringify)
         .process(testHtml);
 
@@ -123,15 +129,46 @@ function extractLinks(html: string): { internal: string; external: string; broke
 }
 
 /**
- * 比较两个HTML字符串是否匹配
- * @param actual 实际HTML
- * @param expected 期望HTML
- * @returns 是否匹配
+ * Compares two HTML strings semantically (attribute order and whitespace are
+ * ignored) by parsing both and serializing them with sorted attributes.
  */
 function compareHTML(actual: string, expected: string): boolean {
-  // 简化实现：移除所有空白字符再比较
-  const normalizeHTML = (html: string) => html.replace(/\s+/g, "").trim();
   return normalizeHTML(actual) === normalizeHTML(expected);
+}
+
+interface HtmlNode {
+  type: string;
+  data?: string;
+  name?: string;
+  attribs?: Record<string, string>;
+  children?: HtmlNode[];
+}
+
+function normalizeHTML(html: string): string {
+  const $ = cheerio.load(`<div id="__smart_links_root__">${html}</div>`, null, false);
+
+  const serialize = (node: HtmlNode): string => {
+    if (node.type === "text")
+      return node.data ?? "";
+    if (node.type === "comment")
+      return `<!--${node.data ?? ""}-->`;
+
+    const tag = node.name ?? "";
+    const attributes = Object.entries(node.attribs ?? {})
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(" ");
+    const children = (node.children ?? []).map(serialize).join("");
+
+    return `<${tag}${attributes ? ` ${attributes}` : ""}>${children}</${tag}>`;
+  };
+
+  return $("#__smart_links_root__")
+    .contents()
+    .map((_, element) => serialize(element as unknown as HtmlNode))
+    .get()
+    .join("")
+    .replace(/\s+/g, "");
 }
 
 /**

@@ -1,441 +1,240 @@
 [English](README.md) | [中文](README.zh-CN.md)
 
-# rehype-smart-links
+# astro-smart-links
 
-A rehype plugin for Astro that adds different styles to internal and external links:
+An Astro integration that gives every link in your Markdown a smarter style:
 
-- Internal links (pointing to existing pages): Default style with customizable class
-- Internal links (pointing to non-existent pages): Red style with customizable class (similar to Wikipedia's broken links)
-- External links: Adds "↗" icon (or custom content) and sets target="\_blank", with customizable class
+- **Internal links** (pages that exist) get a customizable class.
+- **Broken internal links** (pages that do not exist) get a red, Wikipedia-style class and are reported at the end of the build.
+- **External links** get an icon `↗`, `target="_blank"` and `rel="noopener noreferrer"` by default.
+
+No routes file, no second build. The integration validates links against the real build output.
+
+> Migrating from `rehype-smart-links@0.x`? See [Migration](#migration-from-rehype-smart-links).
 
 ## Installation
 
 ```bash
 # npm
-npm install rehype-smart-links
-
-# yarn
-yarn add rehype-smart-links
+npm install astro-smart-links
 
 # pnpm
-pnpm add rehype-smart-links
+pnpm add astro-smart-links
+
+# yarn
+yarn add astro-smart-links
 ```
 
 ## Usage
 
-### Basic Configuration
-
-Add the plugin to your Astro configuration:
-
 ```js
 // astro.config.mjs
 import { defineConfig } from "astro/config";
-import rehypeSmartLinks from "rehype-smart-links";
+import { smartLinks } from "astro-smart-links";
 
 export default defineConfig({
-  markdown: {
-    rehypePlugins: [
-      // Basic usage (default settings)
-      rehypeSmartLinks,
-
-      // Or with custom options
-      [
-        rehypeSmartLinks,
-        {
-          content: { type: "text", value: "↗" },
-          internalLinkClass: "internal-link",
-          externalLinkClass: "external-link",
-          brokenLinkClass: "broken-link",
-          contentClass: "external-icon",
-          target: "_blank",
-          rel: "noopener noreferrer",
-          publicDir: "./dist",
-          routesFile: "./.smart-links-routes.json",
-          includeFileExtensions: ["html", "pdf", "zip"], // Only include specific file types
-          includeAllFiles: false // Set to true to include all file types
-        }
-      ]
-    ]
-  }
+  integrations: [
+    smartLinks({
+      internalLinkClass: "internal-link",
+      externalLinkClass: "external-link",
+      brokenLinkClass: "broken-link",
+    }),
+  ],
 });
 ```
 
-### Two-Phase Build Process (Recommended)
-
-For accurate detection of valid internal links, a two-phase build process is recommended:
-
-#### Method 1: Using the Built-in CLI Command (Recommended)
-
-rehype-smart-links provides a built-in CLI command to simplify the routes file generation process:
-
-1. Add a build script to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "build:with-routes": "astro build && rehype-smart-links build && astro build"
-  }
-}
-```
-
-2. Run the script to execute the two-phase build:
-
-```bash
-npm run build:with-routes
-```
-
-This command will:
-
-1. First build your site
-2. Use the `rehype-smart-links build` command to scan the build output and generate a routes file
-3. Build the site again, this time using the generated routes information
-
-The CLI command supports the following options:
-
-```
-Options:
-  -d, --dir <path>        Build directory path (default: "./dist")
-  -o, --output <path>     Output path for the routes file (default: "./.smart-links-routes.json")
-  -a, --all               Include all file types (default: false)
-  -e, --extensions <ext>  File extensions to include (default: ["html"])
-  -h, --help              Show help information
-```
-
-#### Method 2: Using the API Functions
-
-You can also write a custom build script:
-
-1. First build the site and create a routes mapping file:
-
-```js
-// In your build script
-import { generateRoutesFile } from "rehype-smart-links";
-
-// First perform a preliminary build
-await build();
-
-// Then generate a routes file from the build output directory
-generateRoutesFile("./dist", "./.smart-links-routes.json", {
-  includeAllFiles: true, // Include all file types
-  // Or only include specific file types
-  includeFileExtensions: ["html", "pdf", "zip"]
-});
-
-// Finally perform the final build
-await build();
-```
-
-2. Add a build script to your `package.json`:
-
-```json
-{
-  "scripts": {
-    "build": "node ./scripts/build-with-routes.js"
-  }
-}
-```
-
-3. Create a build script (e.g., `scripts/build-with-routes.js`):
-
-```js
-import { execSync } from "node:child_process";
-import { generateRoutesFile } from "rehype-smart-links";
-
-// Phase 1: Initial build
-console.log("[PHASE 1] Initial build...");
-execSync("astro build", { stdio: "inherit" });
-
-// Generate routes mapping file
-console.log("[PHASE 2] Generating routes map...");
-generateRoutesFile("./dist", "./.smart-links-routes.json", {
-  includeAllFiles: true // Include all file types
-});
-
-// Phase 2: Build again with routes information
-console.log("[PHASE 3] Final build with routes...");
-execSync("astro build", { stdio: "inherit" });
-
-console.log("[SUCCESS] Build complete!");
-```
-
-## Customizing Link Structure
-
-In addition to adding classes, you can fully customize the HTML structure of the links:
-
-```js
-import rehypeSmartLinks from "rehype-smart-links";
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [
-      [
-        rehypeSmartLinks,
-        {
-          wrapperTemplate: (node, type, className) => {
-            // Create tooltip wrapper
-            if (type === "external") {
-              // Example structure for external links
-              const tooltip = {
-                type: "element",
-                tagName: "div",
-                properties: {
-                  className: ["tooltip"],
-                  dataTooltip: "This is an external link"
-                },
-                children: [node]
-              };
-
-              // You can also modify the original node
-              if (className) {
-                node.properties.className
-                  = [...(node.properties.className || []), className];
-              }
-
-              return tooltip;
-            }
-            else if (type === "broken") {
-              // Example structure for broken links
-              const wrapper = {
-                type: "element",
-                tagName: "span",
-                properties: {
-                  className: ["broken-link-wrapper"],
-                  dataError: "Page doesn't exist"
-                },
-                children: [node]
-              };
-
-              // Add a warning icon
-              node.children.push({
-                type: "element",
-                tagName: "span",
-                properties: { className: ["warning-icon"] },
-                children: [{ type: "text", value: "⚠" }]
-              });
-
-              return wrapper;
-            }
-
-            // Only add class for internal links
-            if (className) {
-              node.properties.className
-                = [...(node.properties.className || []), className];
-            }
-
-            return node;
-          }
-        }
-      ]
-    ]
-  }
-});
-```
-
-This approach allows you to create completely different HTML structures for different types of links, not just add class names, making it ideal for use with component libraries like DaisyUI and TailwindCSS.
-
-## Styling
-
-Add CSS styles for different link types:
+Add the classes to your global CSS:
 
 ```css
-/* Default style for internal links */
 .internal-link {
-  /* Custom styles */
+  color: #2563eb;
 }
 
-/* External links with icons */
-.external-link {
-  /* Custom styles */
+/* Wikipedia-style broken link */
+.broken-link {
+  color: #dc2626;
+  text-decoration: underline wavy;
 }
+
+.external-link {
+  color: #7c3aed;
+}
+
 .external-link .external-icon {
   margin-left: 0.25em;
   font-size: 0.75em;
-}
-
-/* Style for broken links (similar to Wikipedia) */
-.broken-link {
-  color: red;
+  opacity: 0.8;
 }
 ```
+
+## Broken link detection
+
+When the build finishes, the integration scans the generated pages, builds the real route table and:
+
+1. Switches broken internal links from `internal-link` to `broken-link`.
+2. Prints a report to the console.
+3. Optionally writes a `.json`/`.html` report and/or fails the build.
+
+```js
+smartLinks({
+  failOnBroken: true, // exit non-zero on broken links (great for CI)
+  reportFile: ".smart-links-report.json", // or .html
+});
+```
+
+Console output:
+
+```
+[astro-smart-links] Smart links report (2026-01-01T00:00:00.000Z)
+Routes scanned: 42
+Links: 180 internal, 12 external, 2 broken
+
+Broken internal links:
+  /blog/old-post (found in src/content/blog/new-post.md)
+```
+
+Link matching ignores query strings and hashes (`/about?x=1#team` counts as `/about`), resolves relative links against the current page, and handles the Astro `base` sub-path and trailing-slash differences.
+
+## CLI
+
+Check any build directory, even outside Astro:
+
+```bash
+npx astro-smart-links check --dir dist --fail-on-broken
+npx astro-smart-links check --json
+npx astro-smart-links check --all --extensions html pdf zip
+```
+
+| Option | Description |
+| --- | --- |
+| `-d, --dir <path>` | Build directory (default `./dist`) |
+| `-o, --output <path>` | Write the report to a file |
+| `--format <json\|html>` | Report format (default `json`) |
+| `--json` | Print the report to stdout |
+| `-a, --all` | Treat every file type as a valid route |
+| `-e, --extensions <ext...>` | File extensions to include (default `html`) |
+| `--fail-on-broken` | Exit with code 1 when broken links are found |
+| `-q, --quiet` | Only print the summary |
 
 ## Options
 
-| Option                        | Type                                 | Default                         | Description                                           |
-| ----------------------------- | ------------------------------------ | ------------------------------- | ----------------------------------------------------- |
-| `content`                     | `{ type: string, value: string }`    | `{ type: 'text', value: '↗' }` | Content to add after external links                   |
-| `internalLinkClass`           | `string`                             | `'internal-link'`               | Class for internal links to existing pages            |
-| `externalLinkClass`           | `string`                             | `'external-link'`               | Class for external links                              |
-| `brokenLinkClass`             | `string`                             | `'broken-link'`                 | Class for internal links to non-existent pages        |
-| `contentClass`                | `string`                             | `'external-icon'`               | Class for the content element added to external links |
-| `target`                      | `string`                             | `'_blank'`                      | Target attribute for external links                   |
-| `rel`                         | `string`                             | `'noopener noreferrer'`         | Rel attribute for external links                      |
-| `publicDir`                   | `string`                             | `'./dist'`                      | Path to the build output directory                    |
-| `routesFile`                  | `string`                             | `'./.smart-links-routes.json'`  | Path to the routes mapping file                       |
-| `includeFileExtensions`       | `string[]`                           | `['html']`                      | List of file extensions to include                    |
-| `includeAllFiles`             | `boolean`                            | `false`                         | Set to true to include all file types                 |
-| `wrapperTemplate`             | `(node, type, className) => Element` | `undefined`                     | Template function for custom link structure           |
-| `customInternalLinkTransform` | `(node) => void`                     | `undefined`                     | Custom transform function for internal links          |
-| `customExternalLinkTransform` | `(node) => void`                     | `undefined`                     | Custom transform function for external links          |
-| `customBrokenLinkTransform`   | `(node) => void`                     | `undefined`                     | Custom transform function for broken links            |
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `internalLinkClass` | `string` | `'internal-link'` | Class for internal links |
+| `externalLinkClass` | `string` | `'external-link'` | Class for external links |
+| `brokenLinkClass` | `string` | `'broken-link'` | Class for broken links |
+| `content` | `{ type: 'text', value: string } \| null` | `{ type: 'text', value: '↗' }` | Content appended to external links |
+| `contentClass` | `string` | `'external-icon'` | Class of the external icon |
+| `target` | `string \| null` | `'_blank'` | `target` attribute for external links |
+| `rel` | `string \| null` | `'noopener noreferrer'` | `rel` attribute for external links |
+| `ignore` | `(string \| RegExp)[]` | `[]` | Hrefs that are never processed (prefix match or RegExp) |
+| `routes` | `string[]` | — | Explicit route list for broken-link detection |
+| `routesFile` | `string` | — | JSON file with a route list |
+| `publicDir` | `string` | — | Directory to scan for routes |
+| `includeFileExtensions` | `string[]` | `['html']` | Extensions treated as routes while scanning |
+| `includeAllFiles` | `boolean` | `false` | Treat every scanned file as a route |
+| `base` | `string` | Astro `base` | Site sub-path |
+| `wrapperTemplate` | `(node, type, meta) => Element` | — | Fully customize the link HTML |
+| `customInternalLinkTransform` | `(node, meta) => void` | — | Custom transform for internal links |
+| `customExternalLinkTransform` | `(node, meta) => void` | — | Custom transform for external links |
+| `customBrokenLinkTransform` | `(node, meta) => void` | — | Custom transform for broken links |
+| `onLink` | `(record) => void` | — | Called for every processed link |
+| `logger` / `logLevel` | `SmartLinksLogger \| false` / `'debug' \| 'info' \| 'warn' \| 'error' \| 'silent'` | `'warn'` | Diagnostics |
+| `failOnBroken` | `boolean` | `false` | Integration option: fail the build on broken links |
+| `reportFile` | `string` | — | Integration option: write a report file |
+| `reportFormat` | `'json' \| 'html'` | `'json'` | Integration option: report format |
 
-## Advanced Customization
+## Customization
 
-### Using Custom Transform Functions
+### Custom HTML structure
 
-In addition to `wrapperTemplate`, you can use separate transform functions for finer control:
-
-```js
-import rehypeSmartLinks from "rehype-smart-links";
-
-// Example custom transform function for external links
-function customExternalLinkTransform(node) {
-  // Add custom icon or structure
-  node.properties.class = [...(node.properties.class || []), "my-external-link"];
-  node.properties.target = "_blank";
-  node.properties.rel = "noopener";
-
-  // Add custom SVG icon
-  const svgIcon = {
-    type: "element",
-    tagName: "span",
-    properties: { class: "custom-icon" },
-    children: [{ type: "text", value: "🔗" }]
-  };
-
-  node.children.push(svgIcon);
-}
-
-export default {
-  markdown: {
-    rehypePlugins: [
-      [
-        rehypeSmartLinks,
-        {
-          customExternalLinkTransform
-        }
-      ]
-    ]
-  }
-};
-```
-
-### Using with TailwindCSS
+`wrapperTemplate` receives the anchor `node`, the link `type` and a `meta` object (`{ href, pathname, className, sourceFile }`), and returns the replacement node:
 
 ```js
-// Example using TailwindCSS class names
-const tailwindWrapper = (node, type, className) => {
-  // Save original link content
-  const linkChildren = [...node.children];
-
-  // Clear original link content
-  node.children = [];
-
-  if (type === "external") {
-    // Add Tailwind class names for external links
-    node.properties.className = ["text-blue-500", "hover:text-blue-700", "inline-flex", "items-center", "gap-1"];
-
-    // Add original content
-    node.children = [
-      ...linkChildren,
-      {
-        type: "element",
-        tagName: "svg",
-        properties: {
-          className: ["w-4", "h-4"],
-          viewBox: "0 0 24 24",
-          fill: "none",
-          stroke: "currentColor"
-        },
-        children: [{
-          type: "element",
-          tagName: "path",
-          properties: {
-            strokeLinecap: "round",
-            strokeLinejoin: "round",
-            strokeWidth: "2",
-            d: "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-          },
-          children: []
-        }]
-      }
-    ];
-
+smartLinks({
+  wrapperTemplate: (node, type, meta) => {
+    if (type === "external") {
+      node.properties.className = [...(node.properties.className ?? []), "tooltip"];
+      node.properties["data-tip"] = `Opens ${meta.href}`;
+    }
     return node;
-  }
-  else if (type === "broken") {
-    // Create broken link wrapper
-    const wrapper = {
-      type: "element",
-      tagName: "span",
-      properties: {
-        className: ["group", "relative", "inline-block"]
-      },
-      children: [
-        {
-          ...node,
-          properties: {
-            ...node.properties,
-            className: ["text-red-500", "underline", "underline-offset-2", "decoration-wavy", "decoration-red-500"]
-          },
-          children: linkChildren
-        },
-        {
-          type: "element",
-          tagName: "span",
-          properties: {
-            className: ["invisible", "group-hover:visible", "absolute", "bottom-full", "left-1/2", "-translate-x-1/2", "bg-red-100", "text-red-800", "text-xs", "px-2", "py-1", "rounded", "whitespace-nowrap"]
-          },
-          children: [{ type: "text", value: "Page doesn't exist" }]
-        }
-      ]
-    };
-
-    return wrapper;
-  }
-  else {
-    // Add Tailwind class names for internal links
-    node.properties.className = ["text-green-600", "hover:text-green-800", "transition-colors"];
-    node.children = linkChildren;
-    return node;
-  }
-};
+  },
+});
 ```
 
-## Testing
+When `wrapperTemplate` is provided it is responsible for applying classes; `meta.className` contains the configured class for the link type.
 
-This plugin includes a comprehensive test suite to ensure functionality works as expected.
+### Custom transforms
 
-### Running Tests
+```js
+smartLinks({
+  customExternalLinkTransform: (node, meta) => {
+    node.properties.target = "_blank";
+    node.properties.rel = "noopener noreferrer";
+    node.properties["data-external"] = "true";
+  },
+});
+```
+
+Custom transforms fully take over the given link type, so set `target`/`rel` yourself when needed.
+
+### Ignoring links
+
+```js
+smartLinks({
+  ignore: ["/draft/", /^\/preview\//],
+});
+```
+
+## Using the rehype plugin directly
+
+The integration is built on an exported rehype plugin, so any rehype-based framework (Next.js, Gatsby, ...) can use it. In that case you provide the routes yourself:
+
+```js
+import { rehypeSmartLinks } from "astro-smart-links";
+
+// unified / Astro markdown config
+rehypePlugins: [
+  [rehypeSmartLinks, { routes: ["/", "/about"] }],
+];
+```
+
+Routes come from `routes`, `routesFile` or `publicDir`. When none is given, every internal link is treated as valid and only styled.
+
+## API
+
+```js
+import {
+  smartLinks, // Astro integration (default export)
+  rehypeSmartLinks, // rehype plugin
+  classifyHref,
+  normalizeRoute,
+  scanRoutes,
+  checkDirectory,
+  buildReport,
+} from "astro-smart-links";
+```
+
+## Migration from rehype-smart-links
+
+`rehype-smart-links@0.x` required a two-phase build (`astro build && rehype-smart-links build && astro build`) and a `.smart-links-routes.json` file. In `astro-smart-links@1.0`:
+
+1. Install `astro-smart-links` and remove `rehype-smart-links`.
+2. Replace the `markdown.rehypePlugins` entry with the `smartLinks()` integration.
+3. Delete the routes file and the `build:with-routes` script.
+4. `wrapperTemplate` now receives `(node, type, meta)` instead of `(node, type, className)`, and returns a replacement node instead of being merged into the original one.
+
+## Development
 
 ```bash
-# Install dependencies first
-npm install
-
-# Run the tests
-npm test
+pnpm install
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+cd example && pnpm dev
 ```
 
-### Adding Test Cases
+## License
 
-If you're experiencing an issue or want to add a new test case:
-
-1. Add a new test case to `tests/cases/testCases.ts` following the existing pattern.
-
-2. Run the tests to verify your test case:
-
-```bash
-npm test
-```
-
-3. The test report will be generated at `tests/results/report.html` with visual comparison between expected and actual outputs.
-
-### Reporting Issues
-
-If you find a bug or have a feature request, please [open an issue](https://github.com/yourusername/rehype-smart-links/issues) with:
-
-1. A clear description of the problem
-2. Steps to reproduce (or ideally, a test case that fails)
-3. Expected vs. actual behavior
-4. Version information for rehype-smart-links and your environment
-
-Pull requests are always welcome!
+[MIT](LICENSE)

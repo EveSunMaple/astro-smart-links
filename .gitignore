@@ -8,4 +8,11 @@ example/.astro
 example/dist
 example/node_modules
 .smart-links-routes.json
-example/.smart-links-routes.json 
+.smart-links-report.json
+example/.smart-links-routes.json
+example/.smart-links-report.json
+tests/results
+tests/fixtures/**/dist
+tests/fixtures/**/node_modules
+tests/fixtures/**/.astro
+tests/fixtures/**/smart-links-report.json
