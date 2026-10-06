@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "pnpm --filter astro-smart-links build && astro build",
     "check": "astro-smart-links check dist",
     "preview": "astro preview"
   },
