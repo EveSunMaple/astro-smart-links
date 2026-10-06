@@ -33,7 +33,7 @@ const program = new Command();
 program
   .name("astro-smart-links")
   .description("CLI utility for astro-smart-links")
-  .version("1.0.0");
+  .version("1.0.1");
 
 program
   .command("check", { isDefault: true })

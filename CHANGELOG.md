@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1
+
+### Fixed
+
+- Ship a CommonJS build (`dist/index.cjs`) and add the `require` export condition, so `require("astro-smart-links")` works in CJS configs (Next.js, Gatsby, ...) as documented. Previously the ESM-only exports map made CJS `require()` fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
+
 ## 1.0.0
 
 ### Added
