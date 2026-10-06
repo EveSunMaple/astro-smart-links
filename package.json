@@ -9,9 +9,9 @@
   "homepage": "https://astro-smart-links.vercel.app/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EveSunMaple/rehype-smart-links.git"
+    "url": "git+https://github.com/EveSunMaple/astro-smart-links.git"
   },
-  "bugs": "https://github.com/EveSunMaple/rehype-smart-links/issues",
+  "bugs": "https://github.com/EveSunMaple/astro-smart-links/issues",
   "keywords": [
     "astro",
     "astro-integration",
