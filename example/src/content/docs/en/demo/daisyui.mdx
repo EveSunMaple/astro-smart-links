@@ -1,406 +1,188 @@
 ---
-title: "DaisyUI Styles"
-description: "Combining astro-smart-links with DaisyUI components"
+title: "DaisyUI Components"
+description: "Style links with daisyUI component classes"
 ---
 
 import CodeExample from "../../../../components/CodeExample.astro";
 
+This page shows how to use [daisyUI](https://daisyui.com/) component classes as `astro-smart-links` class names, so links reuse the component library's styles. Every example supports daisyUI's light and dark themes.
 
-This page demonstrates how to use DaisyUI components to style links processed by astro-smart-links.
+## Badge Links
 
-## Using DaisyUI Badges
-
-You can use DaisyUI badges to create visually distinct links:
+Render links as daisyUI badges:
 
 <CodeExample
-  title="DaisyUI Badge Links"
-  internalLinkHtml='<a href="/about" class="badge badge-primary">About Page</a>'
+  title="Badge Links"
+  internalLinkHtml='<a href="/en/about" class="badge badge-primary">About page</a>'
   externalLinkHtml='<a href="https://github.com" class="badge badge-secondary" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="badge badge-error">Broken Link</a>'
-  lang="en"
+  brokenLinkHtml='<a href="/en/non-existent" class="badge badge-error">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'badge badge-primary',
-        externalLinkClass: 'badge badge-secondary',
-        brokenLinkClass: 'badge badge-error'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'badge badge-primary',
+  externalLinkClass: 'badge badge-secondary',
+  brokenLinkClass: 'badge badge-error',
+}),
 ```
 </CodeExample>
 
-## DaisyUI Buttons
+## Button Links
 
-Transform your markdown links into DaisyUI buttons:
+Render links as daisyUI buttons:
 
 <CodeExample
-  title="DaisyUI Button Links"
-  internalLinkHtml='<a href="/about" class="btn btn-primary btn-sm">About Page</a>'
+  title="Button Links"
+  internalLinkHtml='<a href="/en/about" class="btn btn-primary btn-sm">About page</a>'
   externalLinkHtml='<a href="https://github.com" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="btn btn-error btn-sm">Broken Link</a>'
-  lang="en"
+  brokenLinkHtml='<a href="/en/non-existent" class="btn btn-error btn-sm">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'btn btn-primary btn-sm',
-        externalLinkClass: 'btn btn-secondary btn-sm',
-        brokenLinkClass: 'btn btn-error btn-sm'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'btn btn-primary btn-sm',
+  externalLinkClass: 'btn btn-secondary btn-sm',
+  brokenLinkClass: 'btn btn-error btn-sm',
+}),
 ```
 </CodeExample>
 
-## DaisyUI Link Styles
+## Link Styles
 
-Create links with DaisyUI link styling:
+Use daisyUI's `link` component classes:
 
 <CodeExample
-  title="DaisyUI Link Styles"
-  internalLinkHtml='<a href="/about" class="link link-primary">About Page</a>'
+  title="Link Styles"
+  internalLinkHtml='<a href="/en/about" class="link link-primary">About page</a>'
   externalLinkHtml='<a href="https://github.com" class="link link-secondary" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="link link-error">Broken Link</a>'
-  lang="en"
+  brokenLinkHtml='<a href="/en/non-existent" class="link link-error">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'link link-primary',
-        externalLinkClass: 'link link-secondary',
-        brokenLinkClass: 'link link-error'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'link link-primary',
+  externalLinkClass: 'link link-secondary',
+  brokenLinkClass: 'link link-error',
+}),
 ```
 </CodeExample>
 
-## DaisyUI Cards
+## Card Links
 
-Wrapping links in DaisyUI cards for rich content links:
+Render the link itself as a card:
 
 <CodeExample
-  title="DaisyUI Card Links"
-  internalLinkHtml='<a href="/about" class="card bg-base-100 shadow-xl p-4 w-full max-w-sm hover:shadow-2xl transition-shadow duration-300"><div class="card-body p-2"><h3 class="card-title text-primary">About Page</h3><p class="text-sm opacity-70">Learn more about the project</p></div></a>'
-  externalLinkHtml='<a href="https://github.com" class="card bg-base-100 shadow-xl p-4 w-full max-w-sm hover:shadow-2xl transition-shadow duration-300" target="_blank" rel="noopener noreferrer"><div class="card-body p-2"><h3 class="card-title text-secondary">GitHub</h3><p class="text-sm opacity-70">View source code on GitHub</p></div></a>'
-  brokenLinkHtml='<a href="/non-existent" class="card bg-base-100 shadow-xl p-4 w-full max-w-sm hover:shadow-2xl transition-shadow duration-300"><div class="card-body p-2"><h3 class="card-title text-error">Broken Link</h3><p class="text-sm opacity-70">This link is not working</p></div></a>'
-  lang="en"
+  title="Card Links"
+  internalLinkHtml='<a href="/en/about" class="card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"><div class="card-body"><h3 class="card-title text-base text-primary">About page</h3><p class="text-sm opacity-80">Learn about the project and its design</p></div></a>'
+  externalLinkHtml='<a href="https://github.com" class="card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300" target="_blank" rel="noopener noreferrer"><div class="card-body"><h3 class="card-title text-base text-secondary">GitHub</h3><p class="text-sm opacity-80">View the source code (opens in a new tab)</p></div></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="card w-full max-w-sm bg-base-100 shadow-xl opacity-75 cursor-not-allowed"><div class="card-body"><h3 class="card-title text-base text-error line-through">Broken link</h3><p class="text-sm text-error">This page does not exist</p></div></a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          // Store the original link text
-          const linkText = node.children[0]?.value || 'Link';
-          
-          // Define description based on link type
-          let title, description;
-          
-          if (linkType === 'internal') {
-            title = h('h3', { class: 'card-title text-primary' }, [linkText]);
-            description = h('p', { class: 'text-sm opacity-70' }, ['Learn more about the project']);
-          } 
-          else if (linkType === 'external') {
-            title = h('h3', { class: 'card-title text-secondary' }, [linkText]);
-            description = h('p', { class: 'text-sm opacity-70' }, ['View source code on GitHub']);
-          } 
-          else if (linkType === 'broken') {
-            title = h('h3', { class: 'card-title text-error' }, [linkText]);
-            description = h('p', { class: 'text-sm opacity-70' }, ['This link is not working']);
-          }
-          
-          // Create card body
-          const cardBody = h('div', { class: 'card-body p-2' }, [title, description]);
-          
-          // Update link node
-          node.children = [cardBody];
-          node.properties.className = [
-            'card',
-            'bg-base-100',
-            'shadow-xl',
-            'p-4',
-            'w-full',
-            'max-w-sm',
-            'hover:shadow-2xl',
-            'transition-shadow',
-            'duration-300'
-          ];
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300',
+  externalLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300',
+  brokenLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl opacity-75 cursor-not-allowed',
+}),
 ```
 </CodeExample>
 
-## DaisyUI Tooltips
+## Tooltip Links
 
-Enhancing links with DaisyUI tooltips:
+Wrap links in daisyUI tooltips with `wrapperTemplate`:
 
 <CodeExample
-  title="DaisyUI Tooltip Links"
-  internalLinkHtml='<div class="tooltip tooltip-primary" data-tip="Navigate to About page"><a href="/about" class="link link-hover link-primary">About Page</a></div>'
+  title="Tooltip Links"
+  internalLinkHtml='<div class="tooltip tooltip-primary" data-tip="Navigate to the about page"><a href="/en/about" class="link link-hover link-primary">About page</a></div>'
   externalLinkHtml='<div class="tooltip tooltip-secondary" data-tip="Opens in a new tab"><a href="https://github.com" class="link link-hover link-secondary" target="_blank" rel="noopener noreferrer">GitHub</a></div>'
-  brokenLinkHtml='<div class="tooltip tooltip-error" data-tip="This link is broken"><a href="/non-existent" class="link link-hover link-error">Broken Link</a></div>'
-  lang="en"
+  brokenLinkHtml='<div class="tooltip tooltip-error" data-tip="This link is broken"><a href="/en/non-existent" class="link link-hover link-error">Broken link</a></div>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
+smartLinks({
+  wrapperTemplate: (node, type) => {
+    const variants = {
+      internal: { className: 'tooltip tooltip-primary', tip: 'Navigate to the about page' },
+      external: { className: 'tooltip tooltip-secondary', tip: 'Opens in a new tab' },
+      broken: { className: 'tooltip tooltip-error', tip: 'This link is broken' },
+    };
+    const { className, tip } = variants[type];
+
+    return {
+      type: 'element',
+      tagName: 'div',
+      properties: { className: [className], 'data-tip': tip },
+      children: [node],
+    };
   },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          // Apply appropriate link classes first
-          node.properties.className = [
-            'link',
-            'link-hover',
-            linkType === 'internal' ? 'link-primary' : 
-            linkType === 'external' ? 'link-secondary' : 
-            'link-error'
-          ];
-          
-          // Create tooltip text based on link type
-          let tooltipText;
-          if (linkType === 'internal') {
-            tooltipText = 'Navigate to About page';
-          } else if (linkType === 'external') {
-            tooltipText = 'Opens in a new tab';
-          } else if (linkType === 'broken') {
-            tooltipText = 'This link is broken';
-          }
-          
-          // Create tooltip wrapper
-          return h('div', {
-            class: `tooltip tooltip-${
-              linkType === 'internal' ? 'primary' : 
-              linkType === 'external' ? 'secondary' : 
-              'error'
-            }`,
-            'data-tip': tooltipText
-          }, [node]);
-        }
-      }
-    ]]
-  }
-});
+}),
 ```
 </CodeExample>
 
-## Integration with DaisyUI Themes
+## Theme-Aware Links
 
-DaisyUI's theme system works seamlessly with astro-smart-links, allowing your links to adapt to the currently active theme:
+daisyUI colors come from theme variables, so links follow the active theme:
 
 <CodeExample
   title="Theme-Aware Links"
-  internalLinkHtml='<a href="/about" class="link link-primary">About Page</a>'
+  internalLinkHtml='<a href="/en/about" class="link link-primary">About page</a>'
   externalLinkHtml='<a href="https://github.com" class="link link-accent" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="link link-error">Broken Link</a>'
-  lang="en"
+  brokenLinkHtml='<a href="/en/non-existent" class="link link-error">Broken link</a>'
 >
-```js
-/* global.css (daisyUI 5 is configured in CSS) */
-@import "tailwindcss";
+```css
+/* global.css */
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake, cyberpunk;
+  themes: light --default, dark --prefersdark;
 }
+```
 
+```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'link link-primary',
-          externalLinkClass: 'link link-accent',
-          brokenLinkClass: 'link link-error'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'link link-primary',
+  externalLinkClass: 'link link-accent',
+  brokenLinkClass: 'link link-error',
+}),
 ```
 </CodeExample>
 
 ## Combined Components
 
-You can combine multiple DaisyUI components for complex link styling:
+Combine several component classes, e.g. a button with a badge:
 
 <CodeExample
-  title="Combined DaisyUI Components"
-  internalLinkHtml='<div class="tooltip" data-tip="Internal page"><a href="/about" class="btn gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>About<span class="badge badge-sm">Info</span></a></div>'
-  externalLinkHtml='<div class="tooltip" data-tip="External site"><a href="https://github.com" class="btn gap-2" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>GitHub<span class="badge badge-sm badge-secondary">External</span></a></div>'
-  brokenLinkHtml='<div class="tooltip" data-tip="Link is broken"><a href="/non-existent" class="btn gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Broken Link<span class="badge badge-sm badge-error">Error</span></a></div>'
-  lang="en"
+  title="Combined Components"
+  internalLinkHtml='<a href="/en/about" class="btn btn-primary btn-sm gap-2">About page<span class="badge badge-sm">Internal</span></a>'
+  externalLinkHtml='<a href="https://github.com" class="btn btn-secondary btn-sm gap-2" target="_blank" rel="noopener noreferrer">GitHub<span class="badge badge-sm">External</span></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="btn btn-error btn-sm gap-2">Broken link<span class="badge badge-sm">Missing</span></a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
-import tailwindcss from '@tailwindcss/vite';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          // Store original text
-          const linkText = node.children[0]?.value || 'Link';
-          
-          // Define SVG icon and badge based on link type
-          let icon, badge, tooltipText;
-          
-          if (linkType === 'internal') {
-            // Info icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              class: 'h-4 w-4',
-              fill: 'none',
-              viewBox: '0 0 24 24',
-              stroke: 'currentColor'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              })
-            ]);
-            badge = h('span', { class: 'badge badge-sm' }, ['Info']);
-            tooltipText = 'Internal page';
-          } 
-          else if (linkType === 'external') {
-            // External link icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              class: 'h-4 w-4',
-              fill: 'none',
-              viewBox: '0 0 24 24',
-              stroke: 'currentColor'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-              })
-            ]);
-            badge = h('span', { class: 'badge badge-sm badge-secondary' }, ['External']);
-            tooltipText = 'External site';
-          } 
-          else if (linkType === 'broken') {
-            // Warning icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              class: 'h-4 w-4',
-              fill: 'none',
-              viewBox: '0 0 24 24',
-              stroke: 'currentColor'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              })
-            ]);
-            badge = h('span', { class: 'badge badge-sm badge-error' }, ['Error']);
-            tooltipText = 'Link is broken';
-          }
-          
-          // Update link with icon and badge
-          node.children = [icon, h('span', {}, [linkText]), badge];
-          node.properties.className = ['btn', 'gap-2'];
-          
-          // Wrap in tooltip
-          return h('div', {
-            class: 'tooltip',
-            'data-tip': tooltipText
-          }, [node]);
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'btn btn-primary btn-sm gap-2',
+  externalLinkClass: 'btn btn-secondary btn-sm gap-2',
+  brokenLinkClass: 'btn btn-error btn-sm gap-2',
+}),
 ```
 </CodeExample>
 
 ## Next Steps
 
-Explore more styles:
+Keep exploring:
 
-- [Basic Demo](/en/demo/basic) - Simple link styling examples
-- [Tailwind CSS](/en/demo/tailwind) - Styling links with Tailwind CSS
-- [Custom CSS](/en/demo/custom-css) - Advanced CSS styling techniques
+- [Tailwind Styles](/en/demo/tailwind) - Define link styles with Tailwind utilities
+- [Advanced Features](/en/demo/advanced) - Learn about `wrapperTemplate` and custom transforms

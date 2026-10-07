@@ -8,7 +8,11 @@ interface Props {
   lang?: "zh" | "en";
 }
 
-const { title, internalLinkHtml, externalLinkHtml, brokenLinkHtml, lang = "zh" } = Astro.props;
+const { title, internalLinkHtml, externalLinkHtml, brokenLinkHtml } = Astro.props;
+
+// Derive the labels from the current Starlight locale unless overridden.
+const currentLocale = Astro.currentLocale ?? "";
+const lang: "zh" | "en" = Astro.props.lang ?? (currentLocale.toLowerCase().startsWith("en") ? "en" : "zh");
 
 // Translations for different languages
 const translations = {

@@ -1,62 +1,55 @@
 ---
-title: "CSS Custom Styles"
-description: "Examples of customizing link styles with CSS"
+title: "Custom CSS"
+description: "Add animations and hover effects to link types with plain CSS"
 ---
 
 import CodeExample from "../../../../components/CodeExample.astro";
 import "../../../../styles/demo-links.css";
 
+This page shows how to give link classes rich visual effects with plain CSS. The styles on this page come from the project's `demo-links.css` and can be copied directly.
 
-This page demonstrates how to use CSS to customize styles for different types of links. astro-smart-links adds specific class names to links, allowing you to apply different styles to different types of links.
+## Configuring Classes
 
-## Custom Link Styles
-
-You can style links with CSS:
+First, assign the class names in the integration:
 
 <CodeExample
-  title="Internal Link Animation Effects"
-  internalLinkHtml='<a href="/about" class="underline-animation">About Page</a>'
+  title="Configuring Classes"
+  internalLinkHtml='<a href="/en/about" class="underline-animation">About page</a>'
   externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="warning-link">Non-existent Page</a>'
-  lang="en"
+  brokenLinkHtml='<a href="/en/non-existent" class="warning-link">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // Custom link class names
-        internalLinkClass: 'underline-animation',
-        externalLinkClass: 'border-highlight',
-        brokenLinkClass: 'warning-link',
-        
-        // External link icon
-        content: { type: 'text', value: '↗' },
-        contentClass: 'external-icon',
-        
-        // External link attributes
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'underline-animation',
+  externalLinkClass: 'border-highlight',
+  brokenLinkClass: 'warning-link',
+}),
 ```
+</CodeExample>
 
+## Underline Animation
+
+An underline that expands from left to right on hover:
+
+<CodeExample
+  title="Underline Animation"
+  internalLinkHtml='<a href="/en/about" class="underline-animation">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="underline-animation" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="underline-animation">Broken link</a>'
+>
 ```css
-/* Underline animation */
+/* global.css */
 .underline-animation {
   position: relative;
   text-decoration: none;
-  color: oklch(var(--p));
+  color: var(--color-primary);
 }
+
 .underline-animation::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 2px;
@@ -67,33 +60,108 @@ export default defineConfig({
   transform-origin: left;
   transition: transform 0.3s ease;
 }
+
 .underline-animation:hover::after {
   transform: scaleX(1);
 }
+```
+</CodeExample>
 
-/* Border highlight */
+## Border Highlight
+
+Highlight a dashed underline on hover:
+
+<CodeExample
+  title="Border Highlight"
+  internalLinkHtml='<a href="/en/about" class="border-highlight">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="border-highlight">Broken link</a>'
+>
+```css
+/* global.css */
 .border-highlight {
   text-decoration: none;
-  border-bottom: 1px dashed oklch(var(--a));
+  border-bottom: 1px dashed var(--color-accent);
   padding: 0 4px;
   transition: background-color 0.2s, border-color 0.2s;
 }
+
 .border-highlight:hover {
-  background-color: oklch(var(--a) / 0.1);
-  border-bottom: 1px solid oklch(var(--a));
+  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  border-bottom: 1px solid var(--color-accent);
+}
+```
+</CodeExample>
+
+## Glow on Hover
+
+Fill the background and add a glow on hover:
+
+<CodeExample
+  title="Glow on Hover"
+  internalLinkHtml='<a href="/en/about" class="glow-on-hover">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="glow-on-hover" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="glow-on-hover">Broken link</a>'
+>
+```css
+/* global.css */
+.glow-on-hover {
+  position: relative;
+  text-decoration: none;
+  color: var(--color-primary);
+  padding: 0 4px;
+  transition: color 0.3s;
+  z-index: 1;
 }
 
-/* Broken link warning style */
+.glow-on-hover::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background: transparent;
+  border-radius: 4px;
+  z-index: -1;
+  transition: background 0.3s;
+}
+
+.glow-on-hover:hover {
+  color: var(--color-primary-content);
+}
+
+.glow-on-hover:hover::before {
+  background: var(--color-primary);
+  box-shadow: 0 0 15px color-mix(in oklab, var(--color-primary) 50%, transparent);
+}
+```
+</CodeExample>
+
+## Broken Link Warning
+
+Warn about broken links with a strike-through and gradient animation:
+
+<CodeExample
+  title="Broken Link Warning"
+  internalLinkHtml='<a href="/en/about" class="warning-link">About page (style demo)</a>'
+  externalLinkHtml='<a href="https://github.com" class="warning-link" target="_blank" rel="noopener noreferrer">GitHub (style demo)</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="warning-link">Broken link</a>'
+>
+```css
+/* global.css */
 .warning-link {
   text-decoration: none;
-  color: oklch(var(--a));
-  background: linear-gradient(to right, transparent 50%, oklch(var(--a) / 0.1) 50%);
+  color: var(--color-error);
+  background: linear-gradient(
+    to right,
+    transparent 50%,
+    color-mix(in oklab, var(--color-error) 15%, transparent) 50%
+  );
   background-size: 200% 100%;
   background-position: 0 0;
   transition: background-position 0.3s, color 0.3s;
   padding: 0 4px;
   border-radius: 2px;
 }
+
 .warning-link:hover {
   background-position: -100% 0;
   text-decoration: line-through;
@@ -101,307 +169,9 @@ export default defineConfig({
 ```
 </CodeExample>
 
-## Tooltip Effects
-
-You can also add tooltip effects to links:
-
-<CodeExample
-  title="Link Tooltips"
-  internalLinkHtml='<a href="/about" class="tooltip-link" data-tooltip="View detailed information about us">About Us</a>'
-  externalLinkHtml='<a href="https://github.com" class="tooltip-link" target="_blank" rel="noopener noreferrer" data-tooltip="Visit GitHub project">GitHub Repository<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="tooltip-link" data-tooltip="This page does not exist">Link Broken</a>'
-  lang="en"
->
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // Use wrapperTemplate to customize link attributes
-        wrapperTemplate: (node, linkType, url) => {
-          // Add tooltip-link class to all links
-          node.properties.className = [
-            ...(node.properties.className || []),
-            'tooltip-link'
-          ];
-          
-          // Add different tooltip text based on link type
-          if (linkType === 'internal') {
-            node.properties['data-tooltip'] = 'View detailed information about us';
-          } 
-          else if (linkType === 'external') {
-            // Add tooltip and attributes for external links
-            node.properties['data-tooltip'] = 'Visit GitHub project';
-            node.properties.target = '_blank';
-            node.properties.rel = 'noopener noreferrer';
-            
-            // Add external link icon
-            const icon = h('span', { className: 'external-icon' }, '↗');
-            node.children.push(icon);
-          } 
-          else if (linkType === 'broken') {
-            node.properties['data-tooltip'] = 'This page does not exist';
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
-```
-
-```css  
-/* Tooltips */
-.tooltip-link {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--s));
-  border-bottom: 1px dotted;
-}
-.tooltip-link::before {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 5px 10px;
-  background-color: oklch(var(--b) / 0.8);
-  color: oklch(var(--bc));
-  border-radius: 4px;
-  font-size: 0.8rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-}
-.tooltip-link:hover::before {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Links with tooltips */
-[data-tooltip] {
-  position: relative;
-}
-
-[data-tooltip]::before {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 5px 10px;
-  background-color: oklch(var(--n) / 0.8);
-  color: oklch(var(--nc));
-  border-radius: 4px;
-  font-size: 0.8rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  white-space: nowrap;
-  z-index: 10;
-  pointer-events: none;
-}
-
-[data-tooltip]:hover::before {
-  opacity: 1;
-  visibility: visible;
-}
-```
-</CodeExample>
-
-## Links with Advanced Animations
-
-<CodeExample
-  title="Advanced Animated Link Effects"
-  internalLinkHtml='<a href="/about" class="glow-on-hover">Documentation Page</a>'
-  externalLinkHtml='<a href="https://github.com" class="sliding-border" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="shake-effect">Invalid Link</a>'
-  lang="en"
->
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // Apply different animation classes based on link type
-        internalLinkClass: 'glow-on-hover',
-        externalLinkClass: 'sliding-border',
-        brokenLinkClass: 'shake-effect',
-        
-        // External link attributes and icon
-        content: { type: 'text', value: '↗' },
-        contentClass: 'external-icon',
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
-```
-
-```css
-/* Glow effect */
-.glow-on-hover {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--p));
-  padding: 0 4px;
-  transition: color 0.3s;
-  z-index: 1;
-}
-
-.glow-on-hover::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: oklch(var(--p) / 0);
-  border-radius: 4px;
-  z-index: -1;
-  transition: background 0.3s;
-}
-
-.glow-on-hover:hover {
-  color: oklch(var(--pc));
-}
-
-.glow-on-hover:hover::before {
-  background: oklch(var(--p));
-  box-shadow: 0 0 15px oklch(var(--p) / 0.5);
-}
-
-/* Sliding border effect */
-.sliding-border {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--s));
-  padding: 0 4px;
-}
-
-.sliding-border::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -2px;
-  left: 0;
-  background: linear-gradient(90deg, oklch(var(--s)), oklch(var(--a)));
-  transition: width 0.3s ease-in-out;
-}
-
-.sliding-border:hover::after {
-  width: 100%;
-}
-
-/* Shake effect */
-.shake-effect {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--er));
-  padding: 0 4px;
-}
-
-.shake-effect:hover {
-  animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-2px); }
-  40%, 80% { transform: translateX(2px); }
-}
-```
-</CodeExample>
-
-## Global CSS Style Setup
-
-You can define basic link styles in a global style file and apply these classes in your configuration:
-
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // Use predefined class names
-        internalLinkClass: 'internal-link',
-        externalLinkClass: 'external-link',
-        brokenLinkClass: 'broken-link',
-        
-        // External link icon and attributes
-        contentClass: 'external-icon',
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
-```
-
-You can set up basic styles in your global CSS file:
-
-```css
-/* Global styles (e.g., global.css) */
-
-/* Internal links */
-.internal-link {
-  color: #3b82f6;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s;
-}
-
-.internal-link:hover {
-  border-color: currentColor;
-}
-
-/* External links */
-.external-link {
-  color: #8b5cf6;
-  text-decoration: none;
-  border-bottom: 1px dashed currentColor;
-}
-
-.external-icon {
-  display: inline-block;
-  margin-left: 0.2em;
-  font-size: 0.8em;
-  vertical-align: super;
-}
-
-/* Broken links */
-.broken-link {
-  color: #ef4444;
-  text-decoration: line-through;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-```
-
 ## Next Steps
 
-Explore more examples:
+Keep exploring:
 
-- [Custom Icons](/en/demo/custom-icon) - Learn how to add custom icons to links
-- [Tailwind Styles](/en/demo/tailwind) - Use Tailwind CSS to customize link styles
+- [Custom Icons](/en/demo/custom-icon) - Add icons with `wrapperTemplate`
+- [Tailwind Styles](/en/demo/tailwind) - Define link styles with Tailwind utilities

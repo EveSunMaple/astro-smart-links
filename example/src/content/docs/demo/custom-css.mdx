@@ -1,404 +1,177 @@
 ---
 title: "CSS自定义样式"
-description: "使用CSS自定义链接样式的示例"
+description: "用纯 CSS 为不同类型的链接添加动画与悬停效果"
 ---
 
 import CodeExample from "../../../components/CodeExample.astro";
 import "../../../styles/demo-links.css";
 
+本页面展示如何用纯 CSS 为链接类名定义丰富的视觉效果。页面上的样式均来自本项目的 `demo-links.css`，可以直接复制使用。
 
-本页面展示了如何使用CSS为不同类型的链接设置自定义样式。astro-smart-links 为链接添加特定的类名，使您可以针对不同类型的链接应用不同的样式。
+## 基础类名配置
 
-## 自定义链接样式
-
-您可以通过CSS样式化链接：
+先在集成中指定类名：
 
 <CodeExample
-  title="内部链接动画效果"
+  title="基础类名配置"
   internalLinkHtml='<a href="/about" class="underline-animation">关于页面</a>'
   externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="warning-link">不存在页面</a>'
+  brokenLinkHtml='<a href="/non-existent" class="warning-link">断开链接</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // 自定义链接类名
-        internalLinkClass: 'underline-animation',
-        externalLinkClass: 'border-highlight',
-        brokenLinkClass: 'warning-link',
-        
-        // 外部链接图标
-        content: { type: 'text', value: '↗' },
-        contentClass: 'external-icon',
-        
-        // 外部链接属性
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
-```
-
-```css
-/* 下划线动画 */
-  .underline-animation {
-    position: relative;
-    text-decoration: none;
-    color: oklch(var(--p));
-  }
-  .underline-animation::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    bottom: -2px;
-    left: 0;
-    background-color: currentColor;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-  .underline-animation:hover::after {
-    transform: scaleX(1);
-  }
-  
-  /* 边框高亮 */
-  .border-highlight {
-    text-decoration: none;
-    border-bottom: 1px dashed oklch(var(--a));
-    padding: 0 4px;
-    transition: background-color 0.2s, border-color 0.2s;
-  }
-  .border-highlight:hover {
-    background-color: oklch(var(--a) / 0.1);
-    border-bottom: 1px solid oklch(var(--a));
-  }
-  
-  /* 断开链接警告样式 */
-  .warning-link {
-    text-decoration: none;
-    color: oklch(var(--a));
-    background: linear-gradient(to right, transparent 50%, oklch(var(--a) / 0.1) 50%);
-    background-size: 200% 100%;
-    background-position: 0 0;
-    transition: background-position 0.3s, color 0.3s;
-    padding: 0 4px;
-    border-radius: 2px;
-  }
-  .warning-link:hover {
-    background-position: -100% 0;
-    text-decoration: line-through;
-  }
+smartLinks({
+  internalLinkClass: 'underline-animation',
+  externalLinkClass: 'border-highlight',
+  brokenLinkClass: 'warning-link',
+}),
 ```
 </CodeExample>
 
-## 工具提示效果
+## 下划线动画
 
-您还可以为链接添加工具提示效果：
+悬停时从左向右展开的下划线：
 
 <CodeExample
-  title="链接工具提示"
-  internalLinkHtml='<a href="/about" class="tooltip-link" data-tooltip="查看关于我们的详细信息">关于我们</a>'
-  externalLinkHtml='<a href="https://github.com" class="tooltip-link" target="_blank" rel="noopener noreferrer" data-tooltip="访问GitHub项目">GitHub仓库<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="tooltip-link" data-tooltip="此页面不存在">链接已断开</a>'
+  title="下划线动画"
+  internalLinkHtml='<a href="/about" class="underline-animation">关于页面</a>'
+  externalLinkHtml='<a href="https://github.com" class="underline-animation" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/non-existent" class="underline-animation">断开链接</a>'
 >
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
+```css
+/* global.css */
+.underline-animation {
+  position: relative;
+  text-decoration: none;
+  color: var(--color-primary);
+}
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // 使用wrapperTemplate自定义链接属性
-        wrapperTemplate: (node, linkType, url) => {
-          // 所有链接都添加tooltip-link类
-          node.properties.className = [
-            ...(node.properties.className || []),
-            'tooltip-link'
-          ];
-          
-          // 根据链接类型添加不同的提示文本
-          if (linkType === 'internal') {
-            node.properties['data-tooltip'] = '查看关于我们的详细信息';
-          } 
-          else if (linkType === 'external') {
-            // 为外部链接添加提示和属性
-            node.properties['data-tooltip'] = '访问GitHub项目';
-            node.properties.target = '_blank';
-            node.properties.rel = 'noopener noreferrer';
-            
-            // 添加外部链接图标
-            const icon = h('span', { className: 'external-icon' }, '↗');
-            node.children.push(icon);
-          } 
-          else if (linkType === 'broken') {
-            node.properties['data-tooltip'] = '此页面不存在';
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
-```
+.underline-animation::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
 
-```css  
-  /* 工具提示 */
-  .tooltip-link {
-    position: relative;
-    text-decoration: none;
-    color: oklch(var(--s));
-    border-bottom: 1px dotted;
-  }
-  .tooltip-link::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 5px 10px;
-    background-color: oklch(var(--b) / 0.8);
-    color: oklch(var(--bc));
-    border-radius: 4px;
-    font-size: 0.8rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    white-space: nowrap;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-  }
-  .tooltip-link:hover::before {
-    opacity: 1;
-    visibility: visible;
-  }
-  
-  /* 带工具提示的链接 */
-  [data-tooltip] {
-    position: relative;
-  }
-  
-  [data-tooltip]::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 5px 10px;
-    background-color: oklch(var(--n) / 0.8);
-    color: oklch(var(--nc));
-    border-radius: 4px;
-    font-size: 0.8rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-  }
-  
-  [data-tooltip]:hover::before {
-    opacity: 1;
-    visibility: visible;
-  }
+.underline-animation:hover::after {
+  transform: scaleX(1);
+}
 ```
 </CodeExample>
 
-## 带有高级动画的链接
+## 边框高亮
+
+悬停时高亮虚线下边框：
 
 <CodeExample
-  title="高级动画链接效果"
-  internalLinkHtml='<a href="/about" class="glow-on-hover">文档页面</a>'
-  externalLinkHtml='<a href="https://github.com" class="sliding-border" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
-  brokenLinkHtml='<a href="/non-existent" class="shake-effect">无效链接</a>'
+  title="边框高亮"
+  internalLinkHtml='<a href="/about" class="border-highlight">关于页面</a>'
+  externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/non-existent" class="border-highlight">断开链接</a>'
 >
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // 根据链接类型应用不同的动画类
-        internalLinkClass: 'glow-on-hover',
-        externalLinkClass: 'sliding-border',
-        brokenLinkClass: 'shake-effect',
-        
-        // 外部链接属性和图标
-        content: { type: 'text', value: '↗' },
-        contentClass: 'external-icon',
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
-```
-
 ```css
-/* 发光效果 */
+/* global.css */
+.border-highlight {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--color-accent);
+  padding: 0 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.border-highlight:hover {
+  background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  border-bottom: 1px solid var(--color-accent);
+}
+```
+</CodeExample>
+
+## 悬停发光
+
+悬停时填充背景并产生光晕：
+
+<CodeExample
+  title="悬停发光"
+  internalLinkHtml='<a href="/about" class="glow-on-hover">关于页面</a>'
+  externalLinkHtml='<a href="https://github.com" class="glow-on-hover" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/non-existent" class="glow-on-hover">断开链接</a>'
+>
+```css
+/* global.css */
 .glow-on-hover {
   position: relative;
   text-decoration: none;
-  color: oklch(var(--p));
+  color: var(--color-primary);
   padding: 0 4px;
   transition: color 0.3s;
   z-index: 1;
 }
 
 .glow-on-hover::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: oklch(var(--p) / 0);
+  inset: -2px;
+  background: transparent;
   border-radius: 4px;
   z-index: -1;
   transition: background 0.3s;
 }
 
 .glow-on-hover:hover {
-  color: oklch(var(--pc));
+  color: var(--color-primary-content);
 }
 
 .glow-on-hover:hover::before {
-  background: oklch(var(--p));
-  box-shadow: 0 0 15px oklch(var(--p) / 0.5);
-}
-
-/* 滑动边框效果 */
-.sliding-border {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--s));
-  padding: 0 4px;
-}
-
-.sliding-border::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -2px;
-  left: 0;
-  background: linear-gradient(90deg, oklch(var(--s)), oklch(var(--a)));
-  transition: width 0.3s ease-in-out;
-}
-
-.sliding-border:hover::after {
-  width: 100%;
-}
-
-/* 摇晃效果 */
-.shake-effect {
-  position: relative;
-  text-decoration: none;
-  color: oklch(var(--er));
-  padding: 0 4px;
-}
-
-.shake-effect:hover {
-  animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-2px); }
-  40%, 80% { transform: translateX(2px); }
+  background: var(--color-primary);
+  box-shadow: 0 0 15px color-mix(in oklab, var(--color-primary) 50%, transparent);
 }
 ```
 </CodeExample>
 
-## 全局CSS样式设置
+## 断开链接警告
 
-您可以在全局样式文件中定义基本链接样式，并在配置中应用这些类：
+断开链接使用删除线与渐变动画提示用户：
 
-```js
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        // 使用预定义的类名
-        internalLinkClass: 'internal-link',
-        externalLinkClass: 'external-link',
-        brokenLinkClass: 'broken-link',
-        
-        // 外部链接图标和属性
-        contentClass: 'external-icon',
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }
-    ]]
-  }
-});
-```
-
-您可以在全局CSS文件中设置基本样式：
-
+<CodeExample
+  title="断开链接警告"
+  internalLinkHtml='<a href="/about" class="warning-link">关于页面（样式演示）</a>'
+  externalLinkHtml='<a href="https://github.com" class="warning-link" target="_blank" rel="noopener noreferrer">GitHub（样式演示）</a>'
+  brokenLinkHtml='<a href="/non-existent" class="warning-link">断开链接</a>'
+>
 ```css
-/* 全局样式 (例如 global.css) */
-
-/* 内部链接 */
-.internal-link {
-  color: #3b82f6;
+/* global.css */
+.warning-link {
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s;
+  color: var(--color-error);
+  background: linear-gradient(
+    to right,
+    transparent 50%,
+    color-mix(in oklab, var(--color-error) 15%, transparent) 50%
+  );
+  background-size: 200% 100%;
+  background-position: 0 0;
+  transition: background-position 0.3s, color 0.3s;
+  padding: 0 4px;
+  border-radius: 2px;
 }
 
-.internal-link:hover {
-  border-color: currentColor;
-}
-
-/* 外部链接 */
-.external-link {
-  color: #8b5cf6;
-  text-decoration: none;
-  border-bottom: 1px dashed currentColor;
-}
-
-.external-icon {
-  display: inline-block;
-  margin-left: 0.2em;
-  font-size: 0.8em;
-  vertical-align: super;
-}
-
-/* 断开链接 */
-.broken-link {
-  color: #ef4444;
+.warning-link:hover {
+  background-position: -100% 0;
   text-decoration: line-through;
-  cursor: not-allowed;
-  opacity: 0.7;
 }
 ```
+</CodeExample>
 
 ## 下一步
 
-浏览更多示例：
+继续浏览：
 
-- [自定义图标](/demo/custom-icon) - 学习如何向链接添加自定义图标
-- [Tailwind样式](/demo/tailwind) - 使用Tailwind CSS自定义链接样式
+- [自定义图标](/demo/custom-icon) - 用 `wrapperTemplate` 添加图标
+- [Tailwind 样式](/demo/tailwind) - 用 Tailwind 工具类定义链接样式

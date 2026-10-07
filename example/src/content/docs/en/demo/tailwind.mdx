@@ -1,553 +1,191 @@
 ---
-title: "Tailwind CSS Styles"
-description: "Using Tailwind CSS to customize link styles"
+title: "Tailwind Styles"
+description: "Style different link types with Tailwind CSS utilities"
 ---
 
 import CodeExample from "../../../../components/CodeExample.astro";
 
+This page shows how to use [Tailwind CSS](https://tailwindcss.com/) utilities as `astro-smart-links` class names to give every link type a consistent style. Each example can be copied straight into `astro.config.mjs`.
 
-This page demonstrates how to use Tailwind CSS to customize links processed by the astro-smart-links plugin.
+## Basic Styles
 
-## Basic Tailwind Integration
-
-The simplest way to use Tailwind with astro-smart-links is to add Tailwind classes directly:
+Distinguish link types with colors and underlines:
 
 <CodeExample
-  title="Basic Tailwind Classes"
-  internalLinkHtml='<a href="/about" class="text-blue-600 hover:text-blue-800 underline">About Page</a>'
-  externalLinkHtml='<a href="https://github.com" class="text-purple-600 hover:text-purple-800 underline" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="text-red-600 hover:text-red-800 line-through">Broken Link</a>'
-  lang="en"
+  title="Basic Tailwind Styles"
+  internalLinkHtml='<a href="/en/about" class="text-blue-600 hover:text-blue-800 underline transition-colors">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="text-purple-600 hover:text-purple-800 underline transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="text-red-600 hover:text-red-800 line-through transition-colors">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'text-blue-600 hover:text-blue-800 underline',
-        externalLinkClass: 'text-purple-600 hover:text-purple-800 underline',
-        brokenLinkClass: 'text-red-600 hover:text-red-800 line-through'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'text-blue-600 hover:text-blue-800 underline transition-colors',
+  externalLinkClass: 'text-purple-600 hover:text-purple-800 underline transition-colors',
+  brokenLinkClass: 'text-red-600 hover:text-red-800 line-through transition-colors',
+}),
 ```
 </CodeExample>
 
-## Advanced Tailwind Styling
+## Links with Icons
 
-Create more sophisticated link styles with Tailwind's utility classes:
+Combine `inline-flex` with inline SVG to add an icon to each link type:
 
 <CodeExample
-  title="Advanced Tailwind Styling"
-  internalLinkHtml='<a href="/about" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200">About Page</a>'
-  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 line-through opacity-75 cursor-not-allowed">Broken Link</a>'
-  lang="en"
+  title="Links with Icons"
+  internalLinkHtml='<a href="/en/about" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors">About page<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200',
-        externalLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200',
-        brokenLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 line-through opacity-75 cursor-not-allowed'
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors',
+  externalLinkClass: 'inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 transition-colors',
+  brokenLinkClass: 'inline-flex items-center gap-1 text-red-600 hover:text-red-800 transition-colors',
+}),
 ```
 </CodeExample>
 
-## Custom Icons with Tailwind
+## Button-style Links
 
-Add icons to your links using Tailwind's flex utilities:
+Render links as full buttons:
 
 <CodeExample
-  title="Links with Tailwind Icons"
-  internalLinkHtml='<a href="/about" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800">About Page<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>'
-  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
-  brokenLinkHtml='<a href="/non-existent" class="inline-flex items-center gap-1 text-red-600 hover:text-red-800"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken Link</a>'
-  lang="en"
+  title="Button-style Links"
+  internalLinkHtml='<a href="/en/about" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="inline-block px-4 py-2 bg-red-100 text-red-700 font-medium rounded-lg line-through opacity-75 cursor-not-allowed">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          let icon;
-          
-          if (linkType === 'internal') {
-            // Internal link - right arrow
-            icon = h('svg', {
-              class: 'w-3.5 h-3.5',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M13 7l5 5m0 0l-5 5m5-5H6'
-              })
-            ]);
-            
-            // Add icon to the end of the link
-            node.children.push(icon);
-            node.properties.className = [
-              'inline-flex',
-              'items-center',
-              'gap-1',
-              'text-blue-600',
-              'hover:text-blue-800'
-            ];
-          } 
-          else if (linkType === 'external') {
-            // External link - external link icon
-            icon = h('svg', {
-              class: 'w-3.5 h-3.5',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-              })
-            ]);
-            
-            // Add icon to the end of the link
-            node.children.push(icon);
-            node.properties.className = [
-              'inline-flex',
-              'items-center',
-              'gap-1',
-              'text-purple-600',
-              'hover:text-purple-800'
-            ];
-          } 
-          else if (linkType === 'broken') {
-            // Broken link - warning icon
-            icon = h('svg', {
-              class: 'w-3.5 h-3.5',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              })
-            ]);
-            
-            // Add icon to the beginning of the link
-            node.children = [icon, ...node.children];
-            node.properties.className = [
-              'inline-flex',
-              'items-center',
-              'gap-1',
-              'text-red-600',
-              'hover:text-red-800'
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200',
+  externalLinkClass: 'inline-block px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200',
+  brokenLinkClass: 'inline-block px-4 py-2 bg-red-100 text-red-700 font-medium rounded-lg line-through opacity-75 cursor-not-allowed',
+}),
 ```
 </CodeExample>
 
-## Animated Links with Tailwind
+## Card Links
 
-Create eye-catching animations for your links using Tailwind's transition utilities:
+Wrap link content in a card, ideal for article lists and navigation:
 
 <CodeExample
-  title="Animated Links with Tailwind"
-  internalLinkHtml='<a href="/about" class="relative text-blue-600 font-medium"><span class="relative z-10">About Page</span><span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 origin-left transform scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100"></span></a>'
-  externalLinkHtml='<a href="https://github.com" class="group inline-flex items-center gap-1 text-purple-600 font-medium" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-3.5 h-3.5 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></a>'
-  brokenLinkHtml='<a href="/non-existent" class="relative text-red-600 font-medium cursor-not-allowed"><span class="opacity-75">Broken Link</span><svg class="inline-block w-4 h-4 ml-1 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></a>'
-  lang="en"
+  title="Card Links"
+  internalLinkHtml='<a href="/en/about" class="block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm hover:shadow-md transition-shadow"><span class="font-semibold text-blue-600">About page</span><p class="text-sm text-base-content/70 mt-1">Learn about the project and its design</p></a>'
+  externalLinkHtml='<a href="https://github.com" class="block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm hover:shadow-md transition-shadow" target="_blank" rel="noopener noreferrer"><span class="font-semibold text-purple-600">GitHub</span><p class="text-sm text-base-content/70 mt-1">View the source code (opens in a new tab)</p></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm opacity-75 cursor-not-allowed"><span class="font-semibold text-red-600 line-through">Broken link</span><p class="text-sm text-red-500 mt-1">This page does not exist</p></a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          if (linkType === 'internal') {
-            // Store original text
-            const originalText = node.children[0]?.value || 'Link';
-            
-            // Create underline animation effect
-            node.children = [
-              h('span', { class: 'relative z-10' }, [originalText]),
-              h('span', { 
-                class: 'absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 origin-left transform scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100'
-              })
-            ];
-            
-            node.properties.className = [
-              'relative',
-              'text-blue-600',
-              'font-medium'
-            ];
-          } 
-          else if (linkType === 'external') {
-            // Arrow icon with animation
-            const icon = h('svg', {
-              class: 'w-3.5 h-3.5 transform transition-transform duration-300 group-hover:translate-x-1',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M14 5l7 7m0 0l-7 7m7-7H3'
-              })
-            ]);
-            
-            node.children.push(icon);
-            node.properties.className = [
-              'group',
-              'inline-flex',
-              'items-center',
-              'gap-1',
-              'text-purple-600',
-              'font-medium'
-            ];
-          } 
-          else if (linkType === 'broken') {
-            // Warning icon with animation
-            const text = node.children[0]?.value || 'Broken Link';
-            const icon = h('svg', {
-              class: 'inline-block w-4 h-4 ml-1 animate-pulse',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-              })
-            ]);
-            
-            node.children = [
-              h('span', { class: 'opacity-75' }, [text]),
-              icon
-            ];
-            
-            node.properties.className = [
-              'relative',
-              'text-red-600',
-              'font-medium',
-              'cursor-not-allowed'
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm hover:shadow-md transition-shadow',
+  externalLinkClass: 'block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm hover:shadow-md transition-shadow',
+  brokenLinkClass: 'block p-4 bg-base-100 border border-base-300 rounded-lg shadow-sm opacity-75 cursor-not-allowed',
+}),
 ```
 </CodeExample>
 
-## Tailwind Card Links
+## Animated Links
 
-Create card-style links for more prominent navigation options:
+Add hover feedback with `transition` and transform utilities:
 
 <CodeExample
-  title="Tailwind Card Links"
-  internalLinkHtml='<a href="/about" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200"><div class="flex items-center"><div class="shrink-0 bg-blue-100 p-2 rounded-lg"><svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">About Page</h3><p class="text-xs text-gray-500">Learn more about our project</p></div></div></a>'
-  externalLinkHtml='<a href="https://github.com" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors duration-200" target="_blank" rel="noopener noreferrer"><div class="flex items-center"><div class="shrink-0 bg-purple-100 p-2 rounded-lg"><svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900">GitHub Repository</h3><p class="text-xs text-gray-500">View source code (opens in new tab)</p></div></div></a>'
-  brokenLinkHtml='<a href="/non-existent" class="block p-4 bg-white border border-gray-200 rounded-lg shadow-sm opacity-75 cursor-not-allowed"><div class="flex items-center"><div class="shrink-0 bg-red-100 p-2 rounded-lg"><svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div class="ml-4"><h3 class="text-sm font-medium text-gray-900 line-through">Broken Link</h3><p class="text-xs text-red-500">This page does not exist</p></div></div></a>'
-  lang="en"
+  title="Animated Links"
+  internalLinkHtml='<a href="/en/about" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium transition-transform duration-200 hover:translate-x-1">About page →</a>'
+  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium transition-transform duration-200 hover:-translate-y-0.5" target="_blank" rel="noopener noreferrer">GitHub ↗</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-medium line-through transition-transform duration-200 hover:rotate-1">Broken link ⚠</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          const originalText = node.children[0]?.value || 'Link';
-          let icon, container, title, description;
-          
-          if (linkType === 'internal') {
-            // Info icon for internal link
-            icon = h('svg', {
-              class: 'w-5 h-5 text-blue-600',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              })
-            ]);
-            
-            container = h('div', { class: 'shrink-0 bg-blue-100 p-2 rounded-lg' }, [icon]);
-            title = h('h3', { class: 'text-sm font-medium text-gray-900' }, [originalText]);
-            description = h('p', { class: 'text-xs text-gray-500' }, ['Learn more about our project']);
-            
-            node.properties.className = [
-              'block',
-              'p-4',
-              'bg-white',
-              'border',
-              'border-gray-200',
-              'rounded-lg',
-              'shadow-sm',
-              'hover:bg-gray-50',
-              'transition-colors',
-              'duration-200'
-            ];
-          } 
-          else if (linkType === 'external') {
-            // External link icon
-            icon = h('svg', {
-              class: 'w-5 h-5 text-purple-600',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-              })
-            ]);
-            
-            container = h('div', { class: 'shrink-0 bg-purple-100 p-2 rounded-lg' }, [icon]);
-            title = h('h3', { class: 'text-sm font-medium text-gray-900' }, [originalText]);
-            description = h('p', { class: 'text-xs text-gray-500' }, ['View source code (opens in new tab)']);
-            
-            node.properties.className = [
-              'block',
-              'p-4',
-              'bg-white',
-              'border',
-              'border-gray-200',
-              'rounded-lg',
-              'shadow-sm',
-              'hover:bg-gray-50',
-              'transition-colors',
-              'duration-200'
-            ];
-          } 
-          else if (linkType === 'broken') {
-            // Warning icon for broken link
-            icon = h('svg', {
-              class: 'w-5 h-5 text-red-600',
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: '0 0 24 24',
-              xmlns: 'http://www.w3.org/2000/svg'
-            }, [
-              h('path', {
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round',
-                'stroke-width': '2',
-                d: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-              })
-            ]);
-            
-            container = h('div', { class: 'shrink-0 bg-red-100 p-2 rounded-lg' }, [icon]);
-            title = h('h3', { class: 'text-sm font-medium text-gray-900 line-through' }, [originalText]);
-            description = h('p', { class: 'text-xs text-red-500' }, ['This page does not exist']);
-            
-            node.properties.className = [
-              'block',
-              'p-4',
-              'bg-white',
-              'border',
-              'border-gray-200',
-              'rounded-lg',
-              'shadow-sm',
-              'opacity-75',
-              'cursor-not-allowed'
-            ];
-          }
-          
-          // Create content container
-          const content = h('div', { class: 'ml-4' }, [title, description]);
-          
-          // Create flexible layout
-          const flex = h('div', { class: 'flex items-center' }, [container, content]);
-          
-          // Update node children
-          node.children = [flex];
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium transition-transform duration-200 hover:translate-x-1',
+  externalLinkClass: 'inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium transition-transform duration-200 hover:-translate-y-0.5',
+  brokenLinkClass: 'inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-medium line-through transition-transform duration-200 hover:rotate-1',
+}),
 ```
 </CodeExample>
 
-## Dark Mode Support
+## Dark Mode
 
-Create links that work well in both light and dark modes with Tailwind's dark mode utilities:
+Use the `dark:` variant to support light and dark themes:
 
 <CodeExample
-  title="Dark Mode Compatible Links"
-  internalLinkHtml='<a href="/about" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline">About Page</a>'
-  externalLinkHtml='<a href="https://github.com" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline" target="_blank" rel="noopener noreferrer">GitHub</a>'
-  brokenLinkHtml='<a href="/non-existent" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through">Broken Link</a>'
-  lang="en"
+  title="Dark Mode Support"
+  internalLinkHtml='<a href="/en/about" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline transition-colors">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through transition-colors">Broken link</a>'
 >
 ```js
-// global.css (Tailwind CSS 4 is configured in CSS)
-// Dark mode follows the `data-theme` attribute by default with daisyUI,
-// or add a custom variant for class-based dark mode:
-@import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
-
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        internalLinkClass: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline',
-        externalLinkClass: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline',
-        brokenLinkClass: 'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through',
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline transition-colors',
+  externalLinkClass: 'text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline transition-colors',
+  brokenLinkClass: 'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 line-through transition-colors',
+}),
 ```
 </CodeExample>
 
-## Tailwind for Tooltips
+## Badge Links
 
-Use Tailwind to create custom tooltips for your links:
+Turn links into pill-shaped tags:
 
 <CodeExample
-  title="Tailwind Tooltip Links"
-  internalLinkHtml='<span class="group relative"><a href="/about" class="text-blue-600 hover:text-blue-800 group-hover:underline">About Page</a><span class="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900">Internal page</span></span>'
-  externalLinkHtml='<span class="group relative"><a href="https://github.com" class="text-purple-600 hover:text-purple-800 group-hover:underline" target="_blank" rel="noopener noreferrer">GitHub</a><span class="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-32 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900">Opens in new tab</span></span>'
-  brokenLinkHtml='<span class="group relative"><a href="/non-existent" class="text-red-600 hover:text-red-800 line-through cursor-not-allowed">Broken Link</a><span class="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900">Link not found</span></span>'
-  lang="en"
+  title="Badge Links"
+  internalLinkHtml='<a href="/en/about" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200" target="_blank" rel="noopener noreferrer">GitHub ↗</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 line-through opacity-75 cursor-not-allowed">Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
-import { h } from 'hastscript';
+import { smartLinks } from 'astro-smart-links';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          // Set link styles based on type
-          if (linkType === 'internal') {
-            node.properties.className = ['text-blue-600', 'hover:text-blue-800', 'group-hover:underline'];
-            
-            // Create tooltip
-            const tooltip = h('span', {
-              class: 'invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900'
-            }, ['Internal page']);
-            
-            // Wrap in container with tooltip
-            return h('span', { class: 'group relative' }, [node, tooltip]);
-          } 
-          else if (linkType === 'external') {
-            node.properties.className = ['text-purple-600', 'hover:text-purple-800', 'group-hover:underline'];
-            
-            // Create tooltip
-            const tooltip = h('span', {
-              class: 'invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-32 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900'
-            }, ['Opens in new tab']);
-            
-            // Wrap in container with tooltip
-            return h('span', { class: 'group relative' }, [node, tooltip]);
-          } 
-          else if (linkType === 'broken') {
-            node.properties.className = ['text-red-600', 'hover:text-red-800', 'line-through', 'cursor-not-allowed'];
-            
-            // Create tooltip
-            const tooltip = h('span', {
-              class: 'invisible group-hover:visible absolute left-1/2 -translate-x-1/2 -bottom-9 w-28 px-2 py-1 bg-gray-900 rounded-md text-center text-white text-xs after:content-[""] after:absolute after:left-1/2 after:-top-1 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-b-gray-900'
-            }, ['Link not found']);
-            
-            // Wrap in container with tooltip
-            return h('span', { class: 'group relative' }, [node, tooltip]);
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+smartLinks({
+  internalLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors duration-200',
+  externalLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200',
+  brokenLinkClass: 'inline-flex items-center px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 line-through opacity-75 cursor-not-allowed',
+}),
+```
+</CodeExample>
+
+## Complete Example
+
+Combine icons, underlines and transitions into one complete style:
+
+<CodeExample
+  title="Complete Example"
+  internalLinkHtml='<a href="/en/about" class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 font-medium transition-colors">About page<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 underline decoration-2 underline-offset-2 font-medium transition-colors" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 underline decoration-wavy decoration-2 underline-offset-2 font-medium transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken link</a>'
+>
+```js
+// astro.config.mjs
+import { smartLinks } from 'astro-smart-links';
+
+smartLinks({
+  internalLinkClass: 'inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 font-medium transition-colors',
+  externalLinkClass: 'inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 underline decoration-2 underline-offset-2 font-medium transition-colors',
+  brokenLinkClass: 'inline-flex items-center gap-1 text-red-600 hover:text-red-800 underline decoration-wavy decoration-2 underline-offset-2 font-medium transition-colors',
+}),
 ```
 </CodeExample>
 
 ## Next Steps
 
-Explore more styling options:
+Keep exploring:
 
-- [Basic Demo](/en/demo/basic) - Simple link styling examples
-- [DaisyUI Styles](/en/demo/daisyui) - Using DaisyUI components with astro-smart-links
-- [Custom CSS](/en/demo/custom-css) - Advanced CSS styling techniques
+- [Custom Icons](/en/demo/custom-icon) - Add custom icons with `wrapperTemplate`
+- [DaisyUI Components](/en/demo/daisyui) - Build link styles with daisyUI components

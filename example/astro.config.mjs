@@ -69,6 +69,7 @@ export default defineConfig({
     }),
     smartLinks({
       reportFile: ".smart-links-report.json",
+      ignore: ["/draft/", /\/preview\//],
     }),
   ],
   vite: {

@@ -1,406 +1,222 @@
 ---
 title: "Custom Icons"
-description: "Using different navigation icons to beautify links"
+description: "Add icons for each link type with wrapperTemplate"
 ---
 
 import CodeExample from "../../../../components/CodeExample.astro";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
+This page shows how to use `wrapperTemplate` to add icons to link types: inline SVG, icon libraries, or icons chosen dynamically from the link destination.
 
-This page demonstrates how to use the `wrapperTemplate` option of astro-smart-links to add custom icons for different types of links.
+## SVG Icons
 
-## SVG Icon Examples
-
-Using SVG icons to add visual cues for different types of links:
+Build SVG icons with `hastscript` and insert them into the link:
 
 <CodeExample
-  title="Beautify Links with SVG Icons"
-  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-1">About Page<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-internal"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>'
-  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-1" target="_blank" rel="noopener noreferrer">GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-external"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>'
-  brokenLinkHtml='<a href="/non-existent" class="broken-link flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-broken"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>Broken Link</a>'
-  lang="en"
+  title="SVG Icons"
+  internalLinkHtml='<a href="/en/about" class="internal-link inline-flex items-center gap-1">About page<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link inline-flex items-center gap-1" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="broken-link inline-flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          let icon;
-          
-          if (linkType === 'internal') {
-            // Internal link icon - chain icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-internal'
-            }, [
-              h('path', { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
-              h('path', { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' })
-            ]);
-            
-            // Add to the end of the link
-            node.children.push(icon);
-          } 
-          else if (linkType === 'external') {
-            // External link icon - external arrow
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-external'
-            }, [
-              h('path', { d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' }),
-              h('polyline', { points: '15 3 21 3 21 9' }),
-              h('line', { x1: '10', y1: '14', x2: '21', y2: '3' })
-            ]);
-            
-            // Add to the end of the link
-            node.children.push(icon);
-          } 
-          else if (linkType === 'broken') {
-            // Broken link icon - broken chain
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-broken'
-            }, [
-              h('path', { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
-              h('path', { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' }),
-              h('line', { x1: '2', y1: '2', x2: '22', y2: '22' })
-            ]);
-            
-            // Add to the beginning of the link
-            node.children = [icon, ...node.children];
-          }
-          
-          // Add Flex layout styles
-          if (icon) {
-            node.properties.className = [
-              ...(node.properties.className || []),
-              'flex',
-              'items-center',
-              'gap-1'
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+const icons = {
+  internal: 'M13 7l5 5m0 0l-5 5m5-5H6',
+  external: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
+  broken: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+};
+
+smartLinks({
+  wrapperTemplate: (node, type) => {
+    const svg = h('svg', {
+      className: 'w-4 h-4',
+      fill: 'none',
+      stroke: 'currentColor',
+      viewBox: '0 0 24 24',
+      xmlns: 'http://www.w3.org/2000/svg',
+    }, [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'stroke-width': '2',
+        'd': icons[type],
+      }),
+    ]);
+
+    if (type === 'broken') {
+      node.children.unshift(svg);
+    } else {
+      node.children.push(svg);
+    }
+
+    node.properties.className = [
+      ...(node.properties.className || []),
+      'inline-flex',
+      'items-center',
+      'gap-1',
+    ];
+
+    return node;
+  },
+}),
 ```
 </CodeExample>
 
-## Icon Animation Effects
+## Icon Animation
 
-Add animation effects to icons to make links more interactive:
+Combine `group` and `transition` utilities for hover animations:
 
 <CodeExample
-  title="Icon Animation Effects"
-  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-1 group">About Us<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:scale-125 transition-transform"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>'
-  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-1 group" target="_blank" rel="noopener noreferrer">Visit GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>'
-  brokenLinkHtml='<a href="/broken-link" class="broken-link flex items-center gap-1 group"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:rotate-12 transition-transform text-red-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>Broken Link</a>'
-  lang="en"
+  title="Icon Animation"
+  internalLinkHtml='<a href="/en/about" class="internal-link group inline-flex items-center gap-1">About page<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link group inline-flex items-center gap-1" target="_blank" rel="noopener noreferrer">GitHub<svg class="w-4 h-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="broken-link group inline-flex items-center gap-1"><svg class="w-4 h-4 text-red-500 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          let icon;
-          
-          if (linkType === 'internal') {
-            // Internal link - arrow icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-animate group-hover:scale-125 transition-transform'
-            }, [
-              h('path', { d: 'M5 12h14' }),
-              h('path', { d: 'M12 5L19 12L12 19' })
-            ]);
-          } 
-          else if (linkType === 'external') {
-            // External link - diagonal arrow
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform'
-            }, [
-              h('line', { x1: '7', y1: '17', x2: '17', y2: '7' }),
-              h('polyline', { points: '7 7 17 7 17 17' })
-            ]);
-          } 
-          else if (linkType === 'broken') {
-            // Broken link - warning icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'icon-animate group-hover:rotate-12 transition-transform text-red-500'
-            }, [
-              h('circle', { cx: '12', cy: '12', r: '10' }),
-              h('line', { x1: '12', y1: '8', x2: '12', y2: '12' }),
-              h('line', { x1: '12', y1: '16', x2: '12.01', y2: '16' })
-            ]);
-          }
-          
-          // Add to node and set style classes
-          if (icon) {
-            if (linkType === 'broken') {
-              node.children = [icon, ...node.children];
-            } else {
-              node.children.push(icon);
-            }
-            
-            node.properties.className = [
-              ...(node.properties.className || []),
-              'flex',
-              'items-center',
-              'gap-1',
-              'group'  // For hover state management
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+const animations = {
+  internal: 'transition-transform group-hover:translate-x-1',
+  external: 'transition-transform group-hover:-translate-y-1 group-hover:translate-x-1',
+  broken: 'text-red-500 transition-transform group-hover:rotate-12',
+};
+
+smartLinks({
+  wrapperTemplate: (node, type) => {
+    const svg = h('svg', {
+      className: `w-4 h-4 ${animations[type]}`,
+      fill: 'none',
+      stroke: 'currentColor',
+      viewBox: '0 0 24 24',
+      xmlns: 'http://www.w3.org/2000/svg',
+    });
+
+    node.children.push(svg);
+    node.properties.className = [
+      ...(node.properties.className || []),
+      'group',
+      'inline-flex',
+      'items-center',
+      'gap-1',
+    ];
+
+    return node;
+  },
+}),
 ```
 </CodeExample>
 
-## Using Icon Libraries
+## Font Awesome Icons
 
-You can also integrate Font Awesome or other icon libraries:
+Use an icon library's class names (the library stylesheet must be loaded):
 
 <CodeExample
-  title="Using Font Awesome Icons"
-  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-2">About Us<i class="fa fa-book"></i></a>'
-  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub<i class="fa fa-external-link"></i></a>'
-  brokenLinkHtml='<a href="/non-existent" class="broken-link flex items-center gap-2"><i class="fa fa-exclamation-triangle"></i>Broken Link</a>'
-  lang="en"
+  title="Font Awesome Icons"
+  internalLinkHtml='<a href="/en/about" class="internal-link inline-flex items-center gap-2">About page<i class="fa fa-book"></i></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link inline-flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub<i class="fa fa-external-link"></i></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="broken-link inline-flex items-center gap-2"><i class="fa fa-exclamation-triangle"></i>Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType) => {
-          let iconClass;
-          
-          if (linkType === 'internal') {
-            iconClass = 'fa fa-book';  // Document icon
-          } else if (linkType === 'external') {
-            iconClass = 'fa fa-external-link';  // External link icon
-          } else if (linkType === 'broken') {
-            iconClass = 'fa fa-exclamation-triangle';  // Warning icon
-          }
-          
-          if (iconClass) {
-            const icon = h('i', { class: iconClass });
-            
-            // Decide icon position based on link type
-            if (linkType === 'broken') {
-              node.children = [icon, ...node.children];
-            } else {
-              node.children.push(icon);
-            }
-            
-            // Add flex layout
-            node.properties.className = [
-              ...(node.properties.className || []),
-              'flex',
-              'items-center',
-              'gap-2'
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+const icons = {
+  internal: 'fa fa-book',
+  external: 'fa fa-external-link',
+  broken: 'fa fa-exclamation-triangle',
+};
+
+smartLinks({
+  wrapperTemplate: (node, type) => {
+    const icon = h('i', { className: icons[type] });
+
+    if (type === 'broken') {
+      node.children.unshift(icon);
+    } else {
+      node.children.push(icon);
+    }
+
+    node.properties.className = [
+      ...(node.properties.className || []),
+      'inline-flex',
+      'items-center',
+      'gap-2',
+    ];
+
+    return node;
+  },
+}),
 ```
 </CodeExample>
 
-## Dynamically Select Icons Based on Site
+## Icons Based on Destination
 
-You can dynamically select different icons based on the link destination URL:
+`meta.href` contains the link target, so you can pick an icon per destination:
 
 <CodeExample
-  title="Select Icons Based on Link Destination"
-  internalLinkHtml='<a href="/docs/getting-started" class="internal-link flex items-center gap-2">Documentation<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>'
-  externalLinkHtml='<a href="https://github.com/EveSunMaple/astro-smart-links" class="external-link flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a>'
-  brokenLinkHtml='<a href="/broken-link" class="broken-link flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M13 2v7h7"></path><line x1="8" y1="17" x2="16" y2="17"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="9" x2="10" y2="9"></line><line x1="4" y1="22" x2="20" y2="2"></line></svg>Broken Link</a>'
-  lang="en"
+  title="Icons Based on Destination"
+  internalLinkHtml='<a href="https://github.com" class="external-link inline-flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub repository<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>'
+  externalLinkHtml='<a href="https://astro.build" class="external-link inline-flex items-center gap-2" target="_blank" rel="noopener noreferrer">Astro website<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="broken-link inline-flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>Broken link</a>'
 >
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
-import { rehypeSmartLinks } from 'astro-smart-links';
+import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
-export default defineConfig({
-  markdown: {
-    rehypePlugins: [[
-      rehypeSmartLinks, 
-      {
-        wrapperTemplate: (node, linkType, url) => {
-          let icon;
-          
-          if (linkType === 'internal') {
-            // Select icon based on URL path
-            if (url.includes('/docs/')) {
-              // Documentation page icon
-              icon = h('svg', {
-                xmlns: 'http://www.w3.org/2000/svg',
-                width: '16',
-                height: '16',
-                viewBox: '0 0 24 24',
-                fill: 'none',
-                stroke: 'currentColor',
-                'stroke-width': '2',
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round'
-              }, [
-                h('path', { d: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z' }),
-                h('path', { d: 'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' })
-              ]);
-            }
-          } 
-          else if (linkType === 'external') {
-            // Select specific icon based on external site
-            if (url.includes('github.com')) {
-              // GitHub icon
-              icon = h('svg', {
-                xmlns: 'http://www.w3.org/2000/svg',
-                width: '16',
-                height: '16',
-                viewBox: '0 0 24 24',
-                fill: 'none',
-                stroke: 'currentColor',
-                'stroke-width': '2',
-                'stroke-linecap': 'round',
-                'stroke-linejoin': 'round'
-              }, [
-                h('path', { d: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22' })
-              ]);
-            }
-          } 
-          else if (linkType === 'broken') {
-            // Broken link icon
-            icon = h('svg', {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: '16',
-              height: '16',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round'
-            }, [
-              h('path', { d: 'M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z' }),
-              h('path', { d: 'M13 2v7h7' }),
-              h('line', { x1: '8', y1: '17', x2: '16', y2: '17' }),
-              h('line', { x1: '8', y1: '13', x2: '14', y2: '13' }),
-              h('line', { x1: '8', y1: '9', x2: '10', y2: '9' }),
-              h('line', { x1: '4', y1: '22', x2: '20', y2: '2' })
-            ]);
-          }
-          
-          // Add icon and styles
-          if (icon) {
-            if (linkType === 'broken') {
-              node.children = [icon, ...node.children];
-            } else {
-              node.children.push(icon);
-            }
-            
-            node.properties.className = [
-              ...(node.properties.className || []),
-              'flex',
-              'items-center',
-              'gap-2'
-            ];
-          }
-          
-          return node;
-        }
-      }
-    ]]
-  }
-});
+const githubIcon = {
+  type: 'element',
+  tagName: 'svg',
+  properties: { className: ['w-4', 'h-4'], viewBox: '0 0 24 24', fill: 'currentColor' },
+  children: [{ type: 'element', tagName: 'path', properties: { d: 'M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.8-.26.8-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.2.7.81.58A12 12 0 0 0 24 12c0-6.63-5.37-12-12-12z' }, children: [] }],
+};
+
+smartLinks({
+  wrapperTemplate: (node, type, meta) => {
+    if (type !== 'external') return node;
+
+    let icon;
+    if (meta.href.includes('github.com')) {
+      icon = githubIcon;
+    } else {
+      icon = h('svg', {
+        className: 'w-4 h-4',
+        fill: 'none',
+        stroke: 'currentColor',
+        viewBox: '0 0 24 24',
+      }, [
+        h('path', {
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+          'stroke-width': '2',
+          'd': 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
+        }),
+      ]);
+    }
+
+    node.children.push(icon);
+    node.properties.className = [
+      ...(node.properties.className || []),
+      'inline-flex',
+      'items-center',
+      'gap-2',
+    ];
+
+    return node;
+  },
+}),
 ```
 </CodeExample>
 
 ## Next Steps
 
-Explore more examples:
+Keep exploring:
 
-- [Tailwind Styles](/en/demo/tailwind) - Use Tailwind CSS to customize link styles
-- [DaisyUI Styles](/en/demo/daisyui) - Use DaisyUI component library to customize link styles
+- [Advanced Features](/en/demo/advanced) - Custom transforms and complete configuration
+- [Custom CSS](/en/demo/custom-css) - Define link animations with plain CSS
