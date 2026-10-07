@@ -11,6 +11,16 @@
   themes: light --default, dark --prefersdark;
 }
 
+@layer base {
+  /* Demo previews are rendered outside `.sl-markdown-content`, so neither
+     Starlight's link reset nor Tailwind preflight applies to them. Drop the
+     browser's default anchor underline; the classes used in each demo
+     (utilities, daisyUI components, .broken-link, ...) decide the decoration. */
+  .code-example a {
+    text-decoration: none;
+  }
+}
+
 /* --- astro-smart-links classes ------------------------------------------- */
 
 .internal-link {
