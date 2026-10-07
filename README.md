@@ -12,6 +12,11 @@ No routes file, no second build. The integration validates links against the rea
 
 > Migrating from `rehype-smart-links@0.x`? See [Migration](#migration-from-rehype-smart-links).
 
+## Requirements
+
+- Node.js 18.17 or newer.
+- Astro 4 or newer. Both Astro 7's default Sätteri Markdown processor and the unified processor from `@astrojs/markdown-remark` are supported.
+
 ## Installation
 
 ```bash

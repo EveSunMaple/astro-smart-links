@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { checkDirectory } from "./core/check.js";
+import { satteriSmartLinksPlugin } from "./core/satteri.js";
 import rehypeSmartLinks from "./rehype.js";
 import { buildReport, formatReport, reportToHTML, reportToJSON } from "./report.js";
 import { resolveOptions } from "./types.js";
@@ -55,13 +56,33 @@ export function smartLinks(options: SmartLinksIntegrationOptions = {}): AstroInt
           },
         });
 
-        updateConfig({
-          markdown: {
-            rehypePlugins: [
-              [rehypeSmartLinks as never, resolved as SmartLinksOptions],
-            ],
-          },
-        });
+        const processor = (config.markdown as {
+          processor?: {
+            options?: {
+              hastPlugins?: unknown[];
+              rehypePlugins?: unknown[];
+            };
+          };
+        } | undefined)?.processor;
+
+        if (processor?.options && Array.isArray(processor.options.hastPlugins)) {
+          // Astro 7+ default processor (Sätteri).
+          processor.options.hastPlugins.push(satteriSmartLinksPlugin(resolved));
+        }
+        else if (processor?.options && Array.isArray(processor.options.rehypePlugins)) {
+          // Astro 7+ with the unified processor from `@astrojs/markdown-remark`.
+          processor.options.rehypePlugins.push([rehypeSmartLinks as never, resolved as SmartLinksOptions]);
+        }
+        else {
+          // Astro 6 and older: no processor API, inject the rehype plugin directly.
+          updateConfig({
+            markdown: {
+              rehypePlugins: [
+                [rehypeSmartLinks as never, resolved as SmartLinksOptions],
+              ],
+            },
+          });
+        }
       },
 
       "astro:build:done": async ({ dir, logger }) => {

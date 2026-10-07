@@ -12,6 +12,11 @@
 
 > 从 `rehype-smart-links@0.x` 迁移？见 [迁移指南](#从-rehype-smart-links-迁移)。
 
+## 环境要求
+
+- Node.js 18.17 或更高版本。
+- Astro 4 或更高版本。同时支持 Astro 7 默认的 Sätteri Markdown 处理器和 `@astrojs/markdown-remark` 的 unified 处理器。
+
 ## 安装
 
 ```bash

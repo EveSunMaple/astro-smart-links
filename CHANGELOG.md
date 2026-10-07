@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.0
+
+### Added
+
+- Astro 7 support. The integration now inspects the configured `markdown.processor` and registers a Sätteri hast plugin (Astro 7 default) or a rehype plugin (unified from `@astrojs/markdown-remark`) instead of injecting the deprecated `markdown.rehypePlugins`, which no longer coerces cleanly on Astro 7.
+- A Sätteri adapter that runs the shared link transform on a materialized copy of each anchor and writes the result back through the visitor context, so `wrapperTemplate` and custom transforms keep working on both processors.
+
+### Changed
+
+- Development dependency upgraded to Astro 7; CI runs on Node 22 and 24.
+- The documentation example was rebuilt with Starlight (Astro 7 + Tailwind CSS 4 + daisyUI 5), including translated sidebars, search, i18n routes and edit links.
+
 ## 1.0.1
 
 ### Fixed

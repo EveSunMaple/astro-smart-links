@@ -11,6 +11,12 @@ export interface TransformContext {
   options: ResolvedSmartLinksOptions;
   routes?: Set<string>;
   pagePath?: string;
+  sourceFile?: string;
+}
+
+export interface LinkTransformHooks {
+  replace: (node: Element, replacement: Element) => void;
+  appendChild: (node: Element, child: Element) => void;
 }
 
 export interface TransformResult {
@@ -19,15 +25,10 @@ export interface TransformResult {
 }
 
 /**
- * Derives the route of the page that is currently being rendered from the
- * absolute path of its source file.
+ * Derives the route of a page from the absolute path of its source file.
  */
-export function getPagePath(file: VFile | undefined, pagesDir?: string): string | undefined {
-  if (!pagesDir)
-    return undefined;
-
-  const filePath = file?.path ?? file?.history?.[0];
-  if (!filePath)
+export function getPagePath(filePath: string | undefined, pagesDir?: string): string | undefined {
+  if (!pagesDir || !filePath)
     return undefined;
 
   const normalizedPagesDir = pagesDir.replace(/[\\/]+$/, "");
@@ -45,33 +46,108 @@ export function getPagePath(file: VFile | undefined, pagesDir?: string): string 
   return relativePath ? `/${relativePath}` : "/";
 }
 
-function replaceNode(
-  parent: Element | Root | undefined,
-  index: number | undefined,
+/**
+ * Transforms a single anchor element. Shared by the unified rehype plugin and
+ * the Sätteri hast plugin.
+ */
+export function transformAnchor(
   node: Element,
-  replacement: Element,
-): Element {
-  if (replacement !== node && parent && typeof index === "number")
-    parent.children[index] = replacement;
+  href: string,
+  context: TransformContext,
+  hooks: LinkTransformHooks,
+): LinkRecord | undefined {
+  const { options, routes } = context;
 
-  return replacement;
-}
+  const classified = classifyHref(href, {
+    base: options.base,
+    pagePath: context.pagePath,
+    routes,
+    ignore: options.ignore,
+  });
 
-function applyWrapper(
-  node: Element,
-  type: "internal" | "external" | "broken",
-  className: string,
-  meta: LinkMeta,
-  options: ResolvedSmartLinksOptions,
-  parent: Element | Root | undefined,
-  index: number | undefined,
-): void {
-  if (!options.wrapperTemplate)
-    return;
+  if (classified.type === "ignored")
+    return undefined;
 
-  const result = options.wrapperTemplate(node, type, meta);
-  if (result && result !== node)
-    replaceNode(parent, index, node, result);
+  const type = classified.type;
+  const className = type === "internal"
+    ? options.internalLinkClass
+    : type === "external"
+      ? options.externalLinkClass
+      : options.brokenLinkClass;
+
+  const meta: LinkMeta = {
+    href,
+    pathname: classified.pathname,
+    className,
+    sourceFile: context.sourceFile,
+  };
+
+  const record: LinkRecord = {
+    type,
+    href,
+    pathname: classified.pathname,
+    sourceFile: context.sourceFile,
+  };
+
+  options.onLink?.(record);
+
+  const applyWrapper = (): boolean => {
+    if (!options.wrapperTemplate)
+      return false;
+
+    const result = options.wrapperTemplate(node, type, meta);
+    if (result && result !== node)
+      hooks.replace(node, result);
+
+    return true;
+  };
+
+  if (type === "external") {
+    if (options.customExternalLinkTransform) {
+      options.customExternalLinkTransform(node, meta);
+      return record;
+    }
+
+    if (options.target)
+      node.properties.target = options.target;
+    if (options.rel)
+      node.properties.rel = options.rel;
+
+    if (applyWrapper())
+      return record;
+
+    addClass(node, options.externalLinkClass);
+    if (options.content)
+      hooks.appendChild(node, createContentElement(options.contentClass, options.content.value));
+
+    return record;
+  }
+
+  if (type === "internal") {
+    if (options.customInternalLinkTransform) {
+      options.customInternalLinkTransform(node, meta);
+      return record;
+    }
+
+    if (applyWrapper())
+      return record;
+
+    addClass(node, options.internalLinkClass);
+    return record;
+  }
+
+  // broken
+  if (options.customBrokenLinkTransform) {
+    options.customBrokenLinkTransform(node, meta);
+    return record;
+  }
+
+  if (applyWrapper())
+    return record;
+
+  removeClass(node, options.internalLinkClass);
+  addClass(node, options.brokenLinkClass);
+  return record;
 }
 
 export function transformTree(
@@ -79,9 +155,8 @@ export function transformTree(
   file: VFile | undefined,
   context: TransformContext,
 ): TransformResult {
-  const { options, routes } = context;
-  const pagePath = context.pagePath ?? getPagePath(file, options.pagesDir);
-  const sourceFile = file?.path ?? file?.history?.[0];
+  const sourceFile = context.sourceFile ?? file?.path ?? file?.history?.[0];
+  const pagePath = context.pagePath ?? getPagePath(sourceFile, context.options.pagesDir);
   const counts = { internal: 0, external: 0, broken: 0 };
   const records: LinkRecord[] = [];
 
@@ -93,86 +168,25 @@ export function transformTree(
     if (typeof href !== "string" || href.length === 0)
       return;
 
-    const classified = classifyHref(href, {
-      base: options.base,
-      pagePath,
-      routes,
-      ignore: options.ignore,
-    });
-
-    if (classified.type === "ignored")
-      return;
-
-    const type = classified.type;
-    const className = type === "internal"
-      ? options.internalLinkClass
-      : type === "external"
-        ? options.externalLinkClass
-        : options.brokenLinkClass;
-
-    const meta: LinkMeta = {
+    const record = transformAnchor(
+      node,
       href,
-      pathname: classified.pathname,
-      className,
-      sourceFile,
-    };
+      { ...context, pagePath, sourceFile },
+      {
+        replace: (_target, replacement) => {
+          if (parent && typeof index === "number")
+            parent.children[index] = replacement;
+        },
+        appendChild: (target, child) => {
+          target.children.push(child);
+        },
+      },
+    );
 
-    counts[type]++;
-    const record: LinkRecord = { type, href, pathname: classified.pathname, sourceFile };
-    records.push(record);
-    options.onLink?.(record);
-
-    if (type === "external") {
-      if (options.customExternalLinkTransform) {
-        options.customExternalLinkTransform(node, meta);
-        return;
-      }
-
-      if (options.target)
-        node.properties.target = options.target;
-      if (options.rel)
-        node.properties.rel = options.rel;
-
-      if (options.wrapperTemplate) {
-        applyWrapper(node, "external", options.externalLinkClass, meta, options, parent, index);
-        return;
-      }
-
-      addClass(node, options.externalLinkClass);
-      if (options.content)
-        node.children.push(createContentElement(options.contentClass, options.content.value));
-
-      return;
+    if (record) {
+      counts[record.type]++;
+      records.push(record);
     }
-
-    if (type === "internal") {
-      if (options.customInternalLinkTransform) {
-        options.customInternalLinkTransform(node, meta);
-        return;
-      }
-
-      if (options.wrapperTemplate) {
-        applyWrapper(node, "internal", options.internalLinkClass, meta, options, parent, index);
-        return;
-      }
-
-      addClass(node, options.internalLinkClass);
-      return;
-    }
-
-    // broken
-    if (options.customBrokenLinkTransform) {
-      options.customBrokenLinkTransform(node, meta);
-      return;
-    }
-
-    if (options.wrapperTemplate) {
-      applyWrapper(node, "broken", options.brokenLinkClass, meta, options, parent, index);
-      return;
-    }
-
-    removeClass(node, options.internalLinkClass);
-    addClass(node, options.brokenLinkClass);
   });
 
   return { counts, records };
