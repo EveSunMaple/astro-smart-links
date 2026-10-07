@@ -40,6 +40,18 @@ An underline that expands from left to right on hover:
   externalLinkHtml='<a href="https://github.com" class="underline-animation" target="_blank" rel="noopener noreferrer">GitHub</a>'
   brokenLinkHtml='<a href="/en/non-existent" class="underline-animation">Broken link</a>'
 >
+```js
+// astro.config.mjs
+import { smartLinks } from 'astro-smart-links';
+
+smartLinks({
+  internalLinkClass: 'underline-animation',
+  externalLinkClass: 'underline-animation',
+  brokenLinkClass: 'underline-animation',
+  content: null,
+}),
+```
+
 ```css
 /* global.css */
 .underline-animation {
@@ -77,6 +89,18 @@ Highlight a dashed underline on hover:
   externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub</a>'
   brokenLinkHtml='<a href="/en/non-existent" class="border-highlight">Broken link</a>'
 >
+```js
+// astro.config.mjs
+import { smartLinks } from 'astro-smart-links';
+
+smartLinks({
+  internalLinkClass: 'border-highlight',
+  externalLinkClass: 'border-highlight',
+  brokenLinkClass: 'border-highlight',
+  content: null,
+}),
+```
+
 ```css
 /* global.css */
 .border-highlight {
@@ -103,6 +127,18 @@ Fill the background and add a glow on hover:
   externalLinkHtml='<a href="https://github.com" class="glow-on-hover" target="_blank" rel="noopener noreferrer">GitHub</a>'
   brokenLinkHtml='<a href="/en/non-existent" class="glow-on-hover">Broken link</a>'
 >
+```js
+// astro.config.mjs
+import { smartLinks } from 'astro-smart-links';
+
+smartLinks({
+  internalLinkClass: 'glow-on-hover',
+  externalLinkClass: 'glow-on-hover',
+  brokenLinkClass: 'glow-on-hover',
+  content: null,
+}),
+```
+
 ```css
 /* global.css */
 .glow-on-hover {
@@ -145,6 +181,18 @@ Warn about broken links with a strike-through and gradient animation:
   externalLinkHtml='<a href="https://github.com" class="warning-link" target="_blank" rel="noopener noreferrer">GitHub (style demo)</a>'
   brokenLinkHtml='<a href="/en/non-existent" class="warning-link">Broken link</a>'
 >
+```js
+// astro.config.mjs
+import { smartLinks } from 'astro-smart-links';
+
+smartLinks({
+  internalLinkClass: 'warning-link',
+  externalLinkClass: 'warning-link',
+  brokenLinkClass: 'warning-link',
+  content: null,
+}),
+```
+
 ```css
 /* global.css */
 .warning-link {

@@ -5,11 +5,11 @@ description: "wrapperTemplate、自定义转换与其他高级选项"
 
 import CodeExample from "../../../components/CodeExample.astro";
 
-本页面介绍 `astro-smart-links` 的高级用法：自定义链接结构、链接转换与完整配置。
+本页面介绍 `astro-smart-links` 的高级用法：自定义链接结构、链接转换与完整配置。每个预览区都是该配置的真实输出。
 
 ## 自定义链接结构
 
-用 `wrapperTemplate` 完全控制链接的 HTML 结构。回调收到 `(node, type, meta)`，返回替换后的节点：
+用 `wrapperTemplate` 完全控制链接的 HTML 结构。回调收到 `(node, type, meta)`，返回替换后的节点；`meta.className` 是当前类型配置的类名：
 
 <CodeExample
   title="自定义链接结构"
@@ -23,7 +23,7 @@ import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 smartLinks({
-  wrapperTemplate: (node, type) => {
+  wrapperTemplate: (node, type, meta) => {
     const icons = {
       internal: ['after', '📄'],
       external: ['after', '🔗'],
@@ -39,6 +39,7 @@ smartLinks({
 
     node.properties.className = [
       ...(node.properties.className || []),
+      meta.className,
       'flex',
       'items-center',
       'gap-1',
@@ -66,7 +67,7 @@ import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 smartLinks({
-  wrapperTemplate: (node, type) => {
+  wrapperTemplate: (node, type, meta) => {
     const badges = {
       internal: ['badge badge-primary badge-sm', '内部'],
       external: ['badge badge-secondary badge-sm', '外部'],
@@ -77,6 +78,7 @@ smartLinks({
     node.children.push(h('span', { className }, label));
     node.properties.className = [
       ...(node.properties.className || []),
+      meta.className,
       'flex',
       'items-center',
       'gap-2',
@@ -90,11 +92,11 @@ smartLinks({
 
 ## 链接转换
 
-`customInternalLinkTransform`、`customExternalLinkTransform` 与 `customBrokenLinkTransform` 按类型修改节点，回调收到 `(node, meta)`，`meta.href` 与 `meta.pathname` 描述当前链接：
+`customInternalLinkTransform`、`customExternalLinkTransform` 与 `customBrokenLinkTransform` 按类型修改节点，回调收到 `(node, meta)`。自定义转换会完全接管该类型，因此需要自己应用 `meta.className`：
 
 <CodeExample
   title="链接转换"
-  internalLinkHtml='<a href="/documentation/getting-started" class="internal-link" data-section="docs">入门指南</a>'
+  internalLinkHtml='<a href="/demo/basic" class="internal-link" data-section="demos">基本演示</a>'
   externalLinkHtml='<a href="https://github.com" class="external-link github-link" target="_blank" rel="noopener noreferrer" data-external="true">GitHub</a>'
   brokenLinkHtml='<a href="/non-existent" class="broken-link" data-error="true" title="此页面不存在">断开链接</a>'
 >
@@ -104,24 +106,23 @@ import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
   customInternalLinkTransform: (node, meta) => {
-    if (meta.pathname?.includes('getting-started')) {
-      node.properties['data-section'] = 'docs';
+    node.properties.className = [...(node.properties.className || []), meta.className];
+    if (meta.pathname?.includes('demo')) {
+      node.properties['data-section'] = 'demos';
     }
   },
   customExternalLinkTransform: (node, meta) => {
-    // 自定义转换会完全接管该类链接，需要自行设置属性
+    node.properties.className = [...(node.properties.className || []), meta.className];
     node.properties.target = '_blank';
     node.properties.rel = 'noopener noreferrer';
     node.properties['data-external'] = 'true';
 
     if (meta.href.includes('github.com')) {
-      node.properties.className = [
-        ...(node.properties.className || []),
-        'github-link',
-      ];
+      node.properties.className.push('github-link');
     }
   },
-  customBrokenLinkTransform: (node) => {
+  customBrokenLinkTransform: (node, meta) => {
+    node.properties.className = [...(node.properties.className || []), meta.className];
     node.properties['data-error'] = 'true';
     node.properties.title = '此页面不存在';
   },
@@ -131,20 +132,21 @@ smartLinks({
 
 ## 忽略链接
 
-草稿、预览等链接可以用 `ignore` 跳过处理，支持字符串前缀和正则：
+被 `ignore` 命中的链接不会做任何处理：不添加类名、不设置 `target`/`rel`、不追加图标，也不参与断链检查。其余链接照常处理：
 
 <CodeExample
   title="忽略链接"
-  internalLinkHtml='<a href="/draft/post" class="internal-link">草稿链接（已被忽略）</a>'
-  externalLinkHtml='<a href="https://example.com" class="external-link" target="_blank" rel="noopener noreferrer">普通外部链接</a>'
-  brokenLinkHtml='<a href="/preview/post" class="broken-link">不会参与断链检查的预览链接</a>'
+  internalLinkHtml='<a href="/draft/post">草稿链接（未被处理）</a>'
+  externalLinkHtml='<a href="https://example.com" class="external-link" target="_blank" rel="noopener noreferrer">普通外部链接<span class="external-icon">↗</span></a>'
+  brokenLinkHtml='<a href="/preview/post">预览链接（不参与断链检查）</a>'
 >
 ```js
 // astro.config.mjs
 import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
-  ignore: ['/draft/', /\/preview\//],
+  // 正则同时匹配中文与英文路径，如 /draft/ 与 /en/draft/
+  ignore: [/\/draft\//, /\/preview\//],
 }),
 ```
 </CodeExample>

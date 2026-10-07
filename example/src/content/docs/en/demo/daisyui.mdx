@@ -5,7 +5,7 @@ description: "Style links with daisyUI component classes"
 
 import CodeExample from "../../../../components/CodeExample.astro";
 
-This page shows how to use [daisyUI](https://daisyui.com/) component classes as `astro-smart-links` class names, so links reuse the component library's styles. Every example supports daisyUI's light and dark themes.
+This page shows how to use [daisyUI](https://daisyui.com/) component classes as `astro-smart-links` class names, so links reuse the component library's styles. Every preview is the real output of that config (examples without an icon disable the default ↗ icon with `content: null`).
 
 ## Badge Links
 
@@ -25,6 +25,7 @@ smartLinks({
   internalLinkClass: 'badge badge-primary',
   externalLinkClass: 'badge badge-secondary',
   brokenLinkClass: 'badge badge-error',
+  content: null,
 }),
 ```
 </CodeExample>
@@ -47,6 +48,7 @@ smartLinks({
   internalLinkClass: 'btn btn-primary btn-sm',
   externalLinkClass: 'btn btn-secondary btn-sm',
   brokenLinkClass: 'btn btn-error btn-sm',
+  content: null,
 }),
 ```
 </CodeExample>
@@ -69,6 +71,7 @@ smartLinks({
   internalLinkClass: 'link link-primary',
   externalLinkClass: 'link link-secondary',
   brokenLinkClass: 'link link-error',
+  content: null,
 }),
 ```
 </CodeExample>
@@ -79,25 +82,26 @@ Render the link itself as a card:
 
 <CodeExample
   title="Card Links"
-  internalLinkHtml='<a href="/en/about" class="card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"><div class="card-body"><h3 class="card-title text-base text-primary">About page</h3><p class="text-sm opacity-80">Learn about the project and its design</p></div></a>'
-  externalLinkHtml='<a href="https://github.com" class="card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300" target="_blank" rel="noopener noreferrer"><div class="card-body"><h3 class="card-title text-base text-secondary">GitHub</h3><p class="text-sm opacity-80">View the source code (opens in a new tab)</p></div></a>'
-  brokenLinkHtml='<a href="/en/non-existent" class="card w-full max-w-sm bg-base-100 shadow-xl opacity-75 cursor-not-allowed"><div class="card-body"><h3 class="card-title text-base text-error line-through">Broken link</h3><p class="text-sm text-error">This page does not exist</p></div></a>'
+  internalLinkHtml='<a href="/en/about" class="card w-full max-w-sm bg-base-100 p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 text-primary font-semibold">About page</a>'
+  externalLinkHtml='<a href="https://github.com" class="card w-full max-w-sm bg-base-100 p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 text-secondary font-semibold" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/en/non-existent" class="card w-full max-w-sm bg-base-100 p-4 shadow-xl text-error font-semibold line-through opacity-75 cursor-not-allowed">Broken link</a>'
 >
 ```js
 // astro.config.mjs
 import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
-  internalLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300',
-  externalLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300',
-  brokenLinkClass: 'card w-full max-w-sm bg-base-100 shadow-xl opacity-75 cursor-not-allowed',
+  internalLinkClass: 'card w-full max-w-sm bg-base-100 p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 text-primary font-semibold',
+  externalLinkClass: 'card w-full max-w-sm bg-base-100 p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 text-secondary font-semibold',
+  brokenLinkClass: 'card w-full max-w-sm bg-base-100 p-4 shadow-xl text-error font-semibold line-through opacity-75 cursor-not-allowed',
+  content: null,
 }),
 ```
 </CodeExample>
 
 ## Tooltip Links
 
-Wrap links in daisyUI tooltips with `wrapperTemplate`:
+Wrap links in daisyUI tooltips with `wrapperTemplate` and apply the link classes with `meta.className`:
 
 <CodeExample
   title="Tooltip Links"
@@ -110,13 +114,18 @@ Wrap links in daisyUI tooltips with `wrapperTemplate`:
 import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
-  wrapperTemplate: (node, type) => {
+  internalLinkClass: 'link link-hover link-primary',
+  externalLinkClass: 'link link-hover link-secondary',
+  brokenLinkClass: 'link link-hover link-error',
+  wrapperTemplate: (node, type, meta) => {
     const variants = {
       internal: { className: 'tooltip tooltip-primary', tip: 'Navigate to the about page' },
       external: { className: 'tooltip tooltip-secondary', tip: 'Opens in a new tab' },
       broken: { className: 'tooltip tooltip-error', tip: 'This link is broken' },
     };
     const { className, tip } = variants[type];
+
+    node.properties.className = [...(node.properties.className || []), meta.className];
 
     return {
       type: 'element',
@@ -154,6 +163,7 @@ smartLinks({
   internalLinkClass: 'link link-primary',
   externalLinkClass: 'link link-accent',
   brokenLinkClass: 'link link-error',
+  content: null,
 }),
 ```
 </CodeExample>
@@ -171,11 +181,20 @@ Combine several component classes, e.g. a button with a badge:
 ```js
 // astro.config.mjs
 import { smartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
 
 smartLinks({
   internalLinkClass: 'btn btn-primary btn-sm gap-2',
   externalLinkClass: 'btn btn-secondary btn-sm gap-2',
   brokenLinkClass: 'btn btn-error btn-sm gap-2',
+  wrapperTemplate: (node, type, meta) => {
+    const labels = { internal: 'Internal', external: 'External', broken: 'Missing' };
+
+    node.children.push(h('span', { className: 'badge badge-sm' }, labels[type]));
+    node.properties.className = [...(node.properties.className || []), meta.className];
+
+    return node;
+  },
 }),
 ```
 </CodeExample>

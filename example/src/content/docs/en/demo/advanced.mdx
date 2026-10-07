@@ -5,11 +5,11 @@ description: "wrapperTemplate, custom transforms and other advanced options"
 
 import CodeExample from "../../../../components/CodeExample.astro";
 
-This page covers the advanced features of `astro-smart-links`: custom link structures, link transforms and a complete configuration.
+This page covers the advanced features of `astro-smart-links`: custom link structures, link transforms and a complete configuration. Every preview is the real output of that config.
 
 ## Custom Link Structure
 
-Fully control the link HTML with `wrapperTemplate`. The callback receives `(node, type, meta)` and returns the replacement node:
+Fully control the link HTML with `wrapperTemplate`. The callback receives `(node, type, meta)` and returns the replacement node; `meta.className` holds the configured class for the link type:
 
 <CodeExample
   title="Custom Link Structure"
@@ -23,7 +23,7 @@ import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 smartLinks({
-  wrapperTemplate: (node, type) => {
+  wrapperTemplate: (node, type, meta) => {
     const icons = {
       internal: ['after', '📄'],
       external: ['after', '🔗'],
@@ -39,6 +39,7 @@ smartLinks({
 
     node.properties.className = [
       ...(node.properties.className || []),
+      meta.className,
       'flex',
       'items-center',
       'gap-1',
@@ -66,7 +67,7 @@ import { smartLinks } from 'astro-smart-links';
 import { h } from 'hastscript';
 
 smartLinks({
-  wrapperTemplate: (node, type) => {
+  wrapperTemplate: (node, type, meta) => {
     const badges = {
       internal: ['badge badge-primary badge-sm', 'Internal'],
       external: ['badge badge-secondary badge-sm', 'External'],
@@ -77,6 +78,7 @@ smartLinks({
     node.children.push(h('span', { className }, label));
     node.properties.className = [
       ...(node.properties.className || []),
+      meta.className,
       'flex',
       'items-center',
       'gap-2',
@@ -90,11 +92,11 @@ smartLinks({
 
 ## Link Transforms
 
-`customInternalLinkTransform`, `customExternalLinkTransform` and `customBrokenLinkTransform` modify nodes per link type. Each callback receives `(node, meta)`, where `meta.href` and `meta.pathname` describe the current link:
+`customInternalLinkTransform`, `customExternalLinkTransform` and `customBrokenLinkTransform` modify nodes per link type. Each callback receives `(node, meta)`. Custom transforms take over the link entirely, so apply `meta.className` yourself:
 
 <CodeExample
   title="Link Transforms"
-  internalLinkHtml='<a href="/en/documentation/getting-started" class="internal-link" data-section="docs">Getting started</a>'
+  internalLinkHtml='<a href="/en/demo/basic" class="internal-link" data-section="demos">Basic demo</a>'
   externalLinkHtml='<a href="https://github.com" class="external-link github-link" target="_blank" rel="noopener noreferrer" data-external="true">GitHub</a>'
   brokenLinkHtml='<a href="/en/non-existent" class="broken-link" data-error="true" title="This page does not exist">Broken link</a>'
 >
@@ -104,24 +106,23 @@ import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
   customInternalLinkTransform: (node, meta) => {
-    if (meta.pathname?.includes('getting-started')) {
-      node.properties['data-section'] = 'docs';
+    node.properties.className = [...(node.properties.className || []), meta.className];
+    if (meta.pathname?.includes('demo')) {
+      node.properties['data-section'] = 'demos';
     }
   },
   customExternalLinkTransform: (node, meta) => {
-    // Custom transforms take over the link entirely, set attributes yourself
+    node.properties.className = [...(node.properties.className || []), meta.className];
     node.properties.target = '_blank';
     node.properties.rel = 'noopener noreferrer';
     node.properties['data-external'] = 'true';
 
     if (meta.href.includes('github.com')) {
-      node.properties.className = [
-        ...(node.properties.className || []),
-        'github-link',
-      ];
+      node.properties.className.push('github-link');
     }
   },
-  customBrokenLinkTransform: (node) => {
+  customBrokenLinkTransform: (node, meta) => {
+    node.properties.className = [...(node.properties.className || []), meta.className];
     node.properties['data-error'] = 'true';
     node.properties.title = 'This page does not exist';
   },
@@ -131,20 +132,21 @@ smartLinks({
 
 ## Ignoring Links
 
-Skip drafts and preview links with `ignore`, which accepts string prefixes and regular expressions:
+Links matched by `ignore` are left completely untouched: no classes, no `target`/`rel`, no icon, and they are excluded from broken-link checks. All other links are processed as usual:
 
 <CodeExample
   title="Ignoring Links"
-  internalLinkHtml='<a href="/en/draft/post" class="internal-link">Draft link (ignored)</a>'
-  externalLinkHtml='<a href="https://example.com" class="external-link" target="_blank" rel="noopener noreferrer">Regular external link</a>'
-  brokenLinkHtml='<a href="/en/preview/post" class="broken-link">Preview link excluded from checks</a>'
+  internalLinkHtml='<a href="/en/draft/post">Draft link (untouched)</a>'
+  externalLinkHtml='<a href="https://example.com" class="external-link" target="_blank" rel="noopener noreferrer">Regular external link<span class="external-icon">↗</span></a>'
+  brokenLinkHtml='<a href="/en/preview/post">Preview link (not checked)</a>'
 >
 ```js
 // astro.config.mjs
 import { smartLinks } from 'astro-smart-links';
 
 smartLinks({
-  ignore: ['/draft/', /\/preview\//],
+  // RegExp patterns match both locales, e.g. /draft/ and /en/draft/
+  ignore: [/\/draft\//, /\/preview\//],
 }),
 ```
 </CodeExample>
