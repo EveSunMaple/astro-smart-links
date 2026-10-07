@@ -33,36 +33,36 @@ const t = translations[lang];
 ---
 
 <div class="code-example not-content mt-8 mb-12">
-  <div class="card bg-base-200 border border-base-300 text-base-content">
-    <div class="card-body">
-      <h3 class="card-title text-lg">{title}</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
-        <div class="bg-base-100 p-4 rounded-lg">
-          <h4 class="font-semibold mb-2">{t.internalLink}</h4>
-          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
-            <Fragment set:html={internalLinkHtml} />
-          </div>
-        </div>
-        
-        <div class="bg-base-100 p-4 rounded-lg">
-          <h4 class="font-semibold mb-2">{t.externalLink}</h4>
-          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
-            <Fragment set:html={externalLinkHtml} />
-          </div>
-        </div>
-        
-        <div class="bg-base-100 p-4 rounded-lg">
-          <h4 class="font-semibold mb-2">{t.brokenLink}</h4>
-          <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
-            <Fragment set:html={brokenLinkHtml} />
-          </div>
+  <!-- Plain utilities instead of the daisyUI card component: its `.card figure`
+       rule would restyle Expressive Code's <figure> frame. -->
+  <div class="rounded-2xl border border-base-300 bg-base-200 text-base-content p-4 sm:p-6">
+    <h3 class="text-lg font-bold">{title}</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-6">
+      <div class="bg-base-100 p-4 rounded-lg">
+        <h4 class="font-semibold mb-2">{t.internalLink}</h4>
+        <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
+          <Fragment set:html={internalLinkHtml} />
         </div>
       </div>
       
-      <div class="mt-2">
-        <slot />
+      <div class="bg-base-100 p-4 rounded-lg">
+        <h4 class="font-semibold mb-2">{t.externalLink}</h4>
+        <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
+          <Fragment set:html={externalLinkHtml} />
+        </div>
       </div>
+      
+      <div class="bg-base-100 p-4 rounded-lg">
+        <h4 class="font-semibold mb-2">{t.brokenLink}</h4>
+        <div class="bg-base-100 rounded p-3 min-h-12 flex items-center border border-base-300 bg-pattern">
+          <Fragment set:html={brokenLinkHtml} />
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-2">
+      <slot />
     </div>
   </div>
 </div>
