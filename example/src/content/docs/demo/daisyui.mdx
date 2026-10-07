@@ -1,0 +1,498 @@
+---
+title: "DaisyUI 集成"
+description: "与DaisyUI组件库集成使用智能链接"
+---
+
+import CodeExample from "../../../components/CodeExample.astro";
+
+
+[DaisyUI](https://daisyui.com/) 是一个基于 Tailwind CSS 的组件库，提供了丰富的 UI 组件。本页面展示如何将 astro-smart-links 与 DaisyUI 组件集成，为链接添加漂亮的样式和交互效果。
+
+## 基础按钮链接
+
+将链接转换为 DaisyUI 按钮样式：
+
+<CodeExample
+  title="DaisyUI 按钮样式链接"
+  internalLinkHtml='<a href="/about" class="btn btn-primary">关于我们</a>'
+  externalLinkHtml='<a href="https://github.com" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">GitHub</a>'
+  brokenLinkHtml='<a href="/non-existent" class="btn btn-error">失效链接</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        internalLinkClass: 'btn btn-primary',
+        externalLinkClass: 'btn btn-secondary',
+        brokenLinkClass: 'btn btn-error',
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 带图标的按钮
+
+在 DaisyUI 按钮中添加图标：
+
+<CodeExample
+  title="带图标的DaisyUI按钮"
+  internalLinkHtml='<a href="/about" class="btn btn-primary gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>关于页面</a>'
+  externalLinkHtml='<a href="https://github.com" class="btn btn-accent gap-2" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>访问GitHub</a>'
+  brokenLinkHtml='<a href="/non-existent" class="btn btn-error gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>链接失效</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          let icon;
+
+          if (linkType === 'internal') {
+            // 内部链接的信息图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'h-5 w-5',
+              fill: 'none',
+              viewBox: '0 0 24 24',
+              stroke: 'currentColor'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+              })
+            ]);
+            
+            // 设置类并添加图标
+            node.properties.className = ['btn', 'btn-primary', 'gap-2'];
+            node.children = [icon, ...node.children];
+          } 
+          else if (linkType === 'external') {
+            // 外部链接的箭头图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'h-5 w-5',
+              fill: 'none',
+              viewBox: '0 0 24 24',
+              stroke: 'currentColor'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
+              })
+            ]);
+            
+            // 设置类并添加图标
+            node.properties.className = ['btn', 'btn-accent', 'gap-2'];
+            node.properties.target = '_blank';
+            node.properties.rel = 'noopener noreferrer';
+            node.children = [icon, ...node.children];
+          } 
+          else if (linkType === 'broken') {
+            // 失效链接的警告图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'h-5 w-5',
+              fill: 'none',
+              viewBox: '0 0 24 24',
+              stroke: 'currentColor'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+              })
+            ]);
+            
+            // 设置类并添加图标
+            node.properties.className = ['btn', 'btn-error', 'gap-2'];
+            node.children = [icon, ...node.children];
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 链接卡片
+
+将链接转换为 DaisyUI 卡片组件：
+
+<CodeExample
+  title="链接卡片"
+  internalLinkHtml='<div class="card w-96 bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"><a href="/about" class="card-body"><h2 class="card-title">关于我们</h2><p>了解更多关于我们的团队和使命</p><div class="card-actions justify-end"><button class="btn btn-primary">查看</button></div></a></div>'
+  externalLinkHtml='<div class="card w-96 bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"><a href="https://github.com" class="card-body" target="_blank" rel="noopener noreferrer"><h2 class="card-title">GitHub</h2><p>访问我们的GitHub仓库</p><div class="card-actions justify-end"><button class="btn btn-accent">访问 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></button></div></a></div>'
+  brokenLinkHtml='<div class="card w-96 bg-base-300 shadow-xl"><a href="/non-existent" class="card-body"><h2 class="card-title text-error">链接失效</h2><p>此链接不存在或已被移除</p><div class="card-actions justify-end"><button class="btn btn-outline btn-error">链接已断开</button></div></a></div>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType, url) => {
+          // 创建卡片容器
+          const cardDiv = h('div', {
+            class: linkType === 'broken' 
+              ? 'card w-96 bg-base-300 shadow-xl' 
+              : 'card w-96 bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300'
+          });
+          
+          // 复制原始链接的属性到新的a元素
+          const linkProps = { ...node.properties, class: 'card-body' };
+          const cardLink = h('a', linkProps);
+          
+          // 根据链接类型创建不同内容
+          let title, description, button;
+          
+          if (linkType === 'internal') {
+            title = h('h2', { class: 'card-title' }, '关于我们');
+            description = h('p', {}, '了解更多关于我们的团队和使命');
+            button = h('button', { class: 'btn btn-primary' }, '查看');
+          } 
+          else if (linkType === 'external') {
+            title = h('h2', { class: 'card-title' }, 'GitHub');
+            description = h('p', {}, '访问我们的GitHub仓库');
+            
+            // 创建带有图标的按钮
+            const externalIcon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'h-4 w-4 ml-1',
+              fill: 'none',
+              viewBox: '0 0 24 24',
+              stroke: 'currentColor'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
+              })
+            ]);
+            
+            button = h('button', { class: 'btn btn-accent' }, ['访问 ', externalIcon]);
+          } 
+          else if (linkType === 'broken') {
+            title = h('h2', { class: 'card-title text-error' }, '链接失效');
+            description = h('p', {}, '此链接不存在或已被移除');
+            button = h('button', { class: 'btn btn-outline btn-error' }, '链接已断开');
+          }
+          
+          // 创建卡片动作区域
+          const cardActions = h('div', { class: 'card-actions justify-end' }, [button]);
+          
+          // 将所有元素组合起来
+          cardLink.children = [title, description, cardActions];
+          cardDiv.children = [cardLink];
+          
+          return cardDiv;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 标签徽章链接
+
+使用 DaisyUI 的徽章组件美化链接：
+
+<CodeExample
+  title="徽章样式链接"
+  internalLinkHtml='<a href="/docs/api" class="badge badge-primary p-4">API文档</a>'
+  externalLinkHtml='<a href="https://github.com" class="badge badge-secondary p-4" target="_blank" rel="noopener noreferrer">GitHub仓库</a>'
+  brokenLinkHtml='<a href="/broken-link" class="badge badge-error p-4">链接失效</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        internalLinkClass: 'badge badge-primary p-4',
+        externalLinkClass: 'badge badge-secondary p-4',
+        brokenLinkClass: 'badge badge-error p-4',
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 提示框链接
+
+将链接包装在 DaisyUI 的提示框组件中：
+
+<CodeExample
+  title="提示框链接"
+  internalLinkHtml='<div class="alert alert-info shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><div><span>查看</span><a href="/about" class="font-bold ml-1">关于我们</a></div></div>'
+  externalLinkHtml='<div class="alert alert-success shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><div><span>访问</span><a href="https://github.com" class="font-bold ml-1" target="_blank" rel="noopener noreferrer">GitHub仓库</a></div></div>'
+  brokenLinkHtml='<div class="alert alert-error shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><div><span>链接失效：</span><a href="/non-existent" class="font-bold ml-1">无法访问</a></div></div>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          let alertType, icon, text;
+          
+          // 保存原始链接的属性和内容
+          const linkProps = { ...node.properties, class: 'font-bold ml-1' };
+          const linkContent = [...node.children];
+          
+          if (linkType === 'internal') {
+            alertType = 'alert-info';
+            text = '查看';
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              fill: 'none',
+              viewBox: '0 0 24 24',
+              class: 'stroke-current shrink-0 w-6 h-6'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+              })
+            ]);
+          } 
+          else if (linkType === 'external') {
+            alertType = 'alert-success';
+            text = '访问';
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'stroke-current shrink-0 h-6 w-6',
+              fill: 'none',
+              viewBox: '0 0 24 24'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+              })
+            ]);
+            
+            // 为外部链接添加属性
+            linkProps.target = '_blank';
+            linkProps.rel = 'noopener noreferrer';
+          } 
+          else if (linkType === 'broken') {
+            alertType = 'alert-error';
+            text = '链接失效：';
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              class: 'stroke-current shrink-0 h-6 w-6',
+              fill: 'none',
+              viewBox: '0 0 24 24'
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                d: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+              })
+            ]);
+          }
+          
+          // 创建新的链接和包装元素
+          const link = h('a', linkProps, linkContent);
+          const textSpan = h('span', {}, text);
+          const textDiv = h('div', {}, [textSpan, link]);
+          const alert = h('div', { class: `alert ${alertType} shadow-lg` }, [icon, textDiv]);
+          
+          return alert;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 自适应链接样式
+
+根据不同主题和颜色方案调整链接样式：
+
+<CodeExample
+  title="自适应主题链接"
+  internalLinkHtml='<a href="/about" class="link link-primary link-hover">关于我们页面</a>'
+  externalLinkHtml='<a href="https://github.com" class="link link-secondary link-hover" target="_blank" rel="noopener noreferrer">GitHub仓库地址</a>'
+  brokenLinkHtml='<a href="/non-existent" class="link link-error link-hover">无效链接地址</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        internalLinkClass: 'link link-primary link-hover',
+        externalLinkClass: 'link link-secondary link-hover',
+        brokenLinkClass: 'link link-error link-hover',
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 综合案例
+
+将 DaisyUI 的多个组件组合使用：
+
+<CodeExample
+  title="混合使用多种组件"
+  internalLinkHtml='<div class="card bg-base-100 shadow-xl"><div class="card-body"><h2 class="card-title"><span class="badge badge-primary">文档</span></h2><p>这是一个内部文档链接</p><div class="card-actions justify-end"><a href="/about" class="btn btn-primary">浏览文档 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 ml-2 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a></div></div></div>'
+  externalLinkHtml='<div class="card bg-base-100 shadow-xl"><div class="card-body"><h2 class="card-title"><span class="badge badge-secondary">外部</span></h2><p>这是一个外部资源链接</p><div class="card-actions justify-end"><a href="https://github.com" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">访问资源 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 ml-2 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div></div></div>'
+  brokenLinkHtml='<div class="card bg-base-300 shadow-xl"><div class="card-body"><h2 class="card-title"><span class="badge badge-error">失效</span></h2><p>这个链接已经失效或不存在</p><div class="card-actions justify-end"><a href="/non-existent" class="btn btn-outline btn-error">尝试访问 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 ml-2 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></a></div></div></div>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          // 创建卡片基础结构
+          const bgClass = linkType === 'broken' ? 'bg-base-300' : 'bg-base-100';
+          const cardDiv = h('div', { class: `card ${bgClass} shadow-xl` });
+          const cardBody = h('div', { class: 'card-body' });
+          
+          // 创建标题和徽章
+          let badgeType, badgeText, linkText, btnClass, iconPath;
+          
+          if (linkType === 'internal') {
+            badgeType = 'badge-primary';
+            badgeText = '文档';
+            linkText = '浏览文档';
+            btnClass = 'btn-primary';
+            iconPath = 'M9 5l7 7-7 7';
+          } 
+          else if (linkType === 'external') {
+            badgeType = 'badge-secondary';
+            badgeText = '外部';
+            linkText = '访问资源';
+            btnClass = 'btn-secondary';
+            iconPath = 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14';
+            
+            // 为外部链接添加属性
+            node.properties.target = '_blank';
+            node.properties.rel = 'noopener noreferrer';
+          } 
+          else if (linkType === 'broken') {
+            badgeType = 'badge-error';
+            badgeText = '失效';
+            linkText = '尝试访问';
+            btnClass = 'btn-outline btn-error';
+            iconPath = 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z';
+          }
+          
+          // 创建各个元素
+          const badge = h('span', { class: `badge ${badgeType}` }, badgeText);
+          const cardTitle = h('h2', { class: 'card-title' }, [badge]);
+          
+          // 描述文本
+          const descriptionText = linkType === 'internal'
+            ? '这是一个内部文档链接'
+            : linkType === 'external'
+              ? '这是一个外部资源链接'
+              : '这个链接已经失效或不存在';
+          
+          const description = h('p', {}, descriptionText);
+          
+          // 创建图标
+          const svgAttrs = linkType === 'external'
+            ? { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', fill: 'none', viewBox: '0 0 24 24', class: 'inline-block w-5 h-5 ml-2 stroke-current' }
+            : { xmlns: 'http://www.w3.org/2000/svg', fill: 'none', viewBox: '0 0 24 24', class: 'inline-block w-5 h-5 ml-2 stroke-current' };
+          
+          const icon = h('svg', svgAttrs, [
+            h('path', {
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              'stroke-width': '2',
+              d: iconPath
+            })
+          ]);
+          
+          // 设置链接属性和内容
+          node.properties.className = `btn ${btnClass}`;
+          node.children = [linkText, ' ', icon];
+          
+          // 创建卡片动作区域
+          const cardActions = h('div', { class: 'card-actions justify-end' }, [node]);
+          
+          // 组合所有元素
+          cardBody.children = [cardTitle, description, cardActions];
+          cardDiv.children = [cardBody];
+          
+          return cardDiv;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 下一步
+
+浏览更多示例：
+
+- [基本演示](/demo/basic) - 了解插件的基本功能
+- [CSS 自定义样式](/demo/custom-css) - 了解如何使用CSS自定义链接样式

@@ -1,0 +1,402 @@
+---
+title: "自定义图标"
+description: "使用不同的跳转图标来美化链接"
+---
+
+import CodeExample from "../../../components/CodeExample.astro";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
+
+本页面展示了如何使用 astro-smart-links 的 `wrapperTemplate` 选项为不同类型的链接添加自定义图标。
+
+## SVG 图标示例
+
+使用 SVG 图标为不同类型的链接添加可视化提示：
+
+<CodeExample
+  title="使用SVG图标美化链接"
+  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-1">关于页面<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-internal"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-1" target="_blank" rel="noopener noreferrer">GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-external"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>'
+  brokenLinkHtml='<a href="/non-existent" class="broken-link flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-broken"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>断开链接</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          let icon;
+          
+          if (linkType === 'internal') {
+            // 内部链接图标 - 链接图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-internal'
+            }, [
+              h('path', { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
+              h('path', { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' })
+            ]);
+            
+            // 添加到链接末尾
+            node.children.push(icon);
+          } 
+          else if (linkType === 'external') {
+            // 外部链接图标 - 外部链接箭头
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-external'
+            }, [
+              h('path', { d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' }),
+              h('polyline', { points: '15 3 21 3 21 9' }),
+              h('line', { x1: '10', y1: '14', x2: '21', y2: '3' })
+            ]);
+            
+            // 添加到链接末尾
+            node.children.push(icon);
+          } 
+          else if (linkType === 'broken') {
+            // 断开链接图标 - 断开的链接
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-broken'
+            }, [
+              h('path', { d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71' }),
+              h('path', { d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' }),
+              h('line', { x1: '2', y1: '2', x2: '22', y2: '22' })
+            ]);
+            
+            // 添加到链接开头
+            node.children = [icon, ...node.children];
+          }
+          
+          // 添加 Flex 布局样式
+          if (icon) {
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'flex',
+              'items-center',
+              'gap-1'
+            ];
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 图标动画效果
+
+为图标添加动画效果，使链接更具交互性：
+
+<CodeExample
+  title="图标动画效果"
+  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-1 group">关于我们<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:scale-125 transition-transform"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-1 group" target="_blank" rel="noopener noreferrer">访问GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>'
+  brokenLinkHtml='<a href="/broken-link" class="broken-link flex items-center gap-1 group"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-animate group-hover:rotate-12 transition-transform text-red-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>断开的链接</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          let icon;
+          
+          if (linkType === 'internal') {
+            // 内部链接 - 箭头图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-animate group-hover:scale-125 transition-transform'
+            }, [
+              h('path', { d: 'M5 12h14' }),
+              h('path', { d: 'M12 5L19 12L12 19' })
+            ]);
+          } 
+          else if (linkType === 'external') {
+            // 外部链接 - 对角线箭头
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-animate group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform'
+            }, [
+              h('line', { x1: '7', y1: '17', x2: '17', y2: '7' }),
+              h('polyline', { points: '7 7 17 7 17 17' })
+            ]);
+          } 
+          else if (linkType === 'broken') {
+            // 断开链接 - 警告图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'icon-animate group-hover:rotate-12 transition-transform text-red-500'
+            }, [
+              h('circle', { cx: '12', cy: '12', r: '10' }),
+              h('line', { x1: '12', y1: '8', x2: '12', y2: '12' }),
+              h('line', { x1: '12', y1: '16', x2: '12.01', y2: '16' })
+            ]);
+          }
+          
+          // 添加到节点，并设置样式类
+          if (icon) {
+            if (linkType === 'broken') {
+              node.children = [icon, ...node.children];
+            } else {
+              node.children.push(icon);
+            }
+            
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'flex',
+              'items-center',
+              'gap-1',
+              'group'  // 用于hover状态管理
+            ];
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 使用图标库
+
+您还可以集成 Font Awesome 或其他图标库：
+
+<CodeExample
+  title="使用Font Awesome图标"
+  internalLinkHtml='<a href="/about" class="internal-link flex items-center gap-2">关于我们<i class="fa fa-book"></i></a>'
+  externalLinkHtml='<a href="https://github.com" class="external-link flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub<i class="fa fa-external-link"></i></a>'
+  brokenLinkHtml='<a href="/non-existent" class="broken-link flex items-center gap-2"><i class="fa fa-exclamation-triangle"></i>断开链接</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType) => {
+          let iconClass;
+          
+          if (linkType === 'internal') {
+            iconClass = 'fa fa-book';  // 文档图标
+          } else if (linkType === 'external') {
+            iconClass = 'fa fa-external-link';  // 外部链接图标
+          } else if (linkType === 'broken') {
+            iconClass = 'fa fa-exclamation-triangle';  // 警告图标
+          }
+          
+          if (iconClass) {
+            const icon = h('i', { class: iconClass });
+            
+            // 根据链接类型决定图标位置
+            if (linkType === 'broken') {
+              node.children = [icon, ...node.children];
+            } else {
+              node.children.push(icon);
+            }
+            
+            // 添加flex布局
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'flex',
+              'items-center',
+              'gap-2'
+            ];
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 基于站点动态选择图标
+
+您可以根据链接目标URL动态选择不同的图标：
+
+<CodeExample
+  title="基于链接目标选择图标"
+  internalLinkHtml='<a href="/docs/getting-started" class="internal-link flex items-center gap-2">文档<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>'
+  externalLinkHtml='<a href="https://github.com/EveSunMaple/astro-smart-links" class="external-link flex items-center gap-2" target="_blank" rel="noopener noreferrer">GitHub<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a>'
+  brokenLinkHtml='<a href="/broken-link" class="broken-link flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M13 2v7h7"></path><line x1="8" y1="17" x2="16" y2="17"></line><line x1="8" y1="13" x2="14" y2="13"></line><line x1="8" y1="9" x2="10" y2="9"></line><line x1="4" y1="22" x2="20" y2="2"></line></svg>断开链接</a>'
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        wrapperTemplate: (node, linkType, url) => {
+          let icon;
+          
+          if (linkType === 'internal') {
+            // 基于URL路径选择图标
+            if (url.includes('/docs/')) {
+              // 文档页面图标
+              icon = h('svg', {
+                xmlns: 'http://www.w3.org/2000/svg',
+                width: '16',
+                height: '16',
+                viewBox: '0 0 24 24',
+                fill: 'none',
+                stroke: 'currentColor',
+                'stroke-width': '2',
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round'
+              }, [
+                h('path', { d: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z' }),
+                h('path', { d: 'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' })
+              ]);
+            }
+          } 
+          else if (linkType === 'external') {
+            // 基于外部网站选择特定图标
+            if (url.includes('github.com')) {
+              // GitHub图标
+              icon = h('svg', {
+                xmlns: 'http://www.w3.org/2000/svg',
+                width: '16',
+                height: '16',
+                viewBox: '0 0 24 24',
+                fill: 'none',
+                stroke: 'currentColor',
+                'stroke-width': '2',
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round'
+              }, [
+                h('path', { d: 'M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22' })
+              ]);
+            }
+          } 
+          else if (linkType === 'broken') {
+            // 断开链接图标
+            icon = h('svg', {
+              xmlns: 'http://www.w3.org/2000/svg',
+              width: '16',
+              height: '16',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round'
+            }, [
+              h('path', { d: 'M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z' }),
+              h('path', { d: 'M13 2v7h7' }),
+              h('line', { x1: '8', y1: '17', x2: '16', y2: '17' }),
+              h('line', { x1: '8', y1: '13', x2: '14', y2: '13' }),
+              h('line', { x1: '8', y1: '9', x2: '10', y2: '9' }),
+              h('line', { x1: '4', y1: '22', x2: '20', y2: '2' })
+            ]);
+          }
+          
+          // 添加图标和样式
+          if (icon) {
+            if (linkType === 'broken') {
+              node.children = [icon, ...node.children];
+            } else {
+              node.children.push(icon);
+            }
+            
+            node.properties.className = [
+              ...(node.properties.className || []),
+              'flex',
+              'items-center',
+              'gap-2'
+            ];
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+</CodeExample>
+
+## 下一步
+
+浏览更多示例：
+
+- [Tailwind样式](/demo/tailwind) - 使用Tailwind CSS自定义链接样式
+- [DaisyUI样式](/demo/daisyui) - 使用DaisyUI组件库自定义链接样式

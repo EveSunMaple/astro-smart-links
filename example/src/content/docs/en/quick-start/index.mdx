@@ -1,0 +1,133 @@
+---
+title: "Installation"
+description: "Get started with astro-smart-links"
+---
+
+
+astro-smart-links is an Astro integration that styles internal links, broken internal links and external links in your Markdown, and checks for broken links at the end of the build.
+
+## Installation
+
+Install the package with your preferred package manager:
+
+```bash
+# npm
+npm install astro-smart-links
+
+# yarn
+yarn add astro-smart-links
+
+# pnpm
+pnpm add astro-smart-links
+```
+
+## Basic configuration
+
+Register the integration in `astro.config.mjs`:
+
+```js
+import { defineConfig } from 'astro/config';
+import { smartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  integrations: [
+    smartLinks({
+      internalLinkClass: 'internal-link',
+      externalLinkClass: 'external-link',
+      brokenLinkClass: 'broken-link',
+    }),
+  ],
+});
+```
+
+During the build the integration will:
+
+1. Add classes, `target`, `rel` and an icon to external links.
+2. Add the `internal-link` class to internal links.
+3. Validate every internal link against the real route table once the build is done, highlight broken links with the `broken-link` class and print a report.
+
+**No second build or routes script is required anymore.** The old `astro build && rehype-smart-links build && astro build` flow has been removed.
+
+### Fail the build on broken links
+
+```js
+smartLinks({
+  failOnBroken: true,
+  reportFile: '.smart-links-report.json',
+}),
+```
+
+## Using it outside Astro
+
+If your project processes Markdown with rehype (Next.js, Gatsby, ...), use the named rehype plugin export. In that case you provide the routes yourself:
+
+```js
+const { rehypeSmartLinks } = require('astro-smart-links');
+
+module.exports = {
+  rehypePlugins: [
+    [rehypeSmartLinks, { routes: ['/', '/about'] }],
+  ],
+};
+```
+
+Routes can come from `routes` (array), `routesFile` (JSON file) or `publicDir` (build directory). When none is provided, every internal link is treated as valid and only styled.
+
+## Styling
+
+The plugin adds the following CSS classes:
+
+- `internal-link`: internal links (pages of your own site)
+- `broken-link`: broken internal links (pages that do not exist)
+- `external-link`: external links (other websites)
+
+Add styles in your global CSS file:
+
+```css
+/* Internal links */
+.internal-link {
+  color: #3b82f6;
+}
+
+/* Broken links (Wikipedia-style red links) */
+.broken-link {
+  color: #ef4444;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+/* External links */
+.external-link {
+  color: #10b981;
+}
+
+.external-link .external-icon {
+  margin-left: 0.25em;
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+```
+
+## Main options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `internalLinkClass` | `string` | `'internal-link'` | CSS class for internal links |
+| `externalLinkClass` | `string` | `'external-link'` | CSS class for external links |
+| `brokenLinkClass` | `string` | `'broken-link'` | CSS class for broken links |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | Content appended to external links, set to `null` to disable |
+| `contentClass` | `string` | `'external-icon'` | CSS class of the external icon |
+| `target` / `rel` | `string` | `'_blank'` / `'noopener noreferrer'` | External link attributes |
+| `ignore` | `(string \| RegExp)[]` | `[]` | Links to skip (prefix match or RegExp) |
+| `routes` | `string[]` | — | Explicit route list |
+| `routesFile` | `string` | — | Path to a routes JSON file |
+| `publicDir` | `string` | — | Build directory to scan for routes |
+| `base` | `string` | Astro `base` config | Site sub-path |
+| `wrapperTemplate` | `function` | — | Fully customize the link HTML |
+| `customInternalLinkTransform` | `function` | — | Custom transform for internal links |
+| `customExternalLinkTransform` | `function` | — | Custom transform for external links |
+| `customBrokenLinkTransform` | `function` | — | Custom transform for broken links |
+| `failOnBroken` | `boolean` | `false` | Integration option: fail the build on broken links |
+| `reportFile` | `string` | — | Integration option: write a report file (`.json` or `.html`) |
+
+See the [advanced demo](/en/demo/advanced) for more customization examples.

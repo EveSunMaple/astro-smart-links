@@ -1,0 +1,407 @@
+---
+title: "CSS Custom Styles"
+description: "Examples of customizing link styles with CSS"
+---
+
+import CodeExample from "../../../../components/CodeExample.astro";
+import "../../../../styles/demo-links.css";
+
+
+This page demonstrates how to use CSS to customize styles for different types of links. astro-smart-links adds specific class names to links, allowing you to apply different styles to different types of links.
+
+## Custom Link Styles
+
+You can style links with CSS:
+
+<CodeExample
+  title="Internal Link Animation Effects"
+  internalLinkHtml='<a href="/about" class="underline-animation">About Page</a>'
+  externalLinkHtml='<a href="https://github.com" class="border-highlight" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
+  brokenLinkHtml='<a href="/non-existent" class="warning-link">Non-existent Page</a>'
+  lang="en"
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        // Custom link class names
+        internalLinkClass: 'underline-animation',
+        externalLinkClass: 'border-highlight',
+        brokenLinkClass: 'warning-link',
+        
+        // External link icon
+        content: { type: 'text', value: '↗' },
+        contentClass: 'external-icon',
+        
+        // External link attributes
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+
+```css
+/* Underline animation */
+.underline-animation {
+  position: relative;
+  text-decoration: none;
+  color: oklch(var(--p));
+}
+.underline-animation::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.underline-animation:hover::after {
+  transform: scaleX(1);
+}
+
+/* Border highlight */
+.border-highlight {
+  text-decoration: none;
+  border-bottom: 1px dashed oklch(var(--a));
+  padding: 0 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.border-highlight:hover {
+  background-color: oklch(var(--a) / 0.1);
+  border-bottom: 1px solid oklch(var(--a));
+}
+
+/* Broken link warning style */
+.warning-link {
+  text-decoration: none;
+  color: oklch(var(--a));
+  background: linear-gradient(to right, transparent 50%, oklch(var(--a) / 0.1) 50%);
+  background-size: 200% 100%;
+  background-position: 0 0;
+  transition: background-position 0.3s, color 0.3s;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+.warning-link:hover {
+  background-position: -100% 0;
+  text-decoration: line-through;
+}
+```
+</CodeExample>
+
+## Tooltip Effects
+
+You can also add tooltip effects to links:
+
+<CodeExample
+  title="Link Tooltips"
+  internalLinkHtml='<a href="/about" class="tooltip-link" data-tooltip="View detailed information about us">About Us</a>'
+  externalLinkHtml='<a href="https://github.com" class="tooltip-link" target="_blank" rel="noopener noreferrer" data-tooltip="Visit GitHub project">GitHub Repository<span class="external-icon">↗</span></a>'
+  brokenLinkHtml='<a href="/non-existent" class="tooltip-link" data-tooltip="This page does not exist">Link Broken</a>'
+  lang="en"
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+import { h } from 'hastscript';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        // Use wrapperTemplate to customize link attributes
+        wrapperTemplate: (node, linkType, url) => {
+          // Add tooltip-link class to all links
+          node.properties.className = [
+            ...(node.properties.className || []),
+            'tooltip-link'
+          ];
+          
+          // Add different tooltip text based on link type
+          if (linkType === 'internal') {
+            node.properties['data-tooltip'] = 'View detailed information about us';
+          } 
+          else if (linkType === 'external') {
+            // Add tooltip and attributes for external links
+            node.properties['data-tooltip'] = 'Visit GitHub project';
+            node.properties.target = '_blank';
+            node.properties.rel = 'noopener noreferrer';
+            
+            // Add external link icon
+            const icon = h('span', { className: 'external-icon' }, '↗');
+            node.children.push(icon);
+          } 
+          else if (linkType === 'broken') {
+            node.properties['data-tooltip'] = 'This page does not exist';
+          }
+          
+          return node;
+        }
+      }
+    ]]
+  }
+});
+```
+
+```css  
+/* Tooltips */
+.tooltip-link {
+  position: relative;
+  text-decoration: none;
+  color: oklch(var(--s));
+  border-bottom: 1px dotted;
+}
+.tooltip-link::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  background-color: oklch(var(--b) / 0.8);
+  color: oklch(var(--bc));
+  border-radius: 4px;
+  font-size: 0.8rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+.tooltip-link:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Links with tooltips */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  background-color: oklch(var(--n) / 0.8);
+  color: oklch(var(--nc));
+  border-radius: 4px;
+  font-size: 0.8rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+```
+</CodeExample>
+
+## Links with Advanced Animations
+
+<CodeExample
+  title="Advanced Animated Link Effects"
+  internalLinkHtml='<a href="/about" class="glow-on-hover">Documentation Page</a>'
+  externalLinkHtml='<a href="https://github.com" class="sliding-border" target="_blank" rel="noopener noreferrer">GitHub<span class="external-icon">↗</span></a>'
+  brokenLinkHtml='<a href="/non-existent" class="shake-effect">Invalid Link</a>'
+  lang="en"
+>
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        // Apply different animation classes based on link type
+        internalLinkClass: 'glow-on-hover',
+        externalLinkClass: 'sliding-border',
+        brokenLinkClass: 'shake-effect',
+        
+        // External link attributes and icon
+        content: { type: 'text', value: '↗' },
+        contentClass: 'external-icon',
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+
+```css
+/* Glow effect */
+.glow-on-hover {
+  position: relative;
+  text-decoration: none;
+  color: oklch(var(--p));
+  padding: 0 4px;
+  transition: color 0.3s;
+  z-index: 1;
+}
+
+.glow-on-hover::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: oklch(var(--p) / 0);
+  border-radius: 4px;
+  z-index: -1;
+  transition: background 0.3s;
+}
+
+.glow-on-hover:hover {
+  color: oklch(var(--pc));
+}
+
+.glow-on-hover:hover::before {
+  background: oklch(var(--p));
+  box-shadow: 0 0 15px oklch(var(--p) / 0.5);
+}
+
+/* Sliding border effect */
+.sliding-border {
+  position: relative;
+  text-decoration: none;
+  color: oklch(var(--s));
+  padding: 0 4px;
+}
+
+.sliding-border::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: linear-gradient(90deg, oklch(var(--s)), oklch(var(--a)));
+  transition: width 0.3s ease-in-out;
+}
+
+.sliding-border:hover::after {
+  width: 100%;
+}
+
+/* Shake effect */
+.shake-effect {
+  position: relative;
+  text-decoration: none;
+  color: oklch(var(--er));
+  padding: 0 4px;
+}
+
+.shake-effect:hover {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-2px); }
+  40%, 80% { transform: translateX(2px); }
+}
+```
+</CodeExample>
+
+## Global CSS Style Setup
+
+You can define basic link styles in a global style file and apply these classes in your configuration:
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[
+      rehypeSmartLinks, 
+      {
+        // Use predefined class names
+        internalLinkClass: 'internal-link',
+        externalLinkClass: 'external-link',
+        brokenLinkClass: 'broken-link',
+        
+        // External link icon and attributes
+        contentClass: 'external-icon',
+        target: '_blank',
+        rel: 'noopener noreferrer'
+      }
+    ]]
+  }
+});
+```
+
+You can set up basic styles in your global CSS file:
+
+```css
+/* Global styles (e.g., global.css) */
+
+/* Internal links */
+.internal-link {
+  color: #3b82f6;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.internal-link:hover {
+  border-color: currentColor;
+}
+
+/* External links */
+.external-link {
+  color: #8b5cf6;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+
+.external-icon {
+  display: inline-block;
+  margin-left: 0.2em;
+  font-size: 0.8em;
+  vertical-align: super;
+}
+
+/* Broken links */
+.broken-link {
+  color: #ef4444;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+```
+
+## Next Steps
+
+Explore more examples:
+
+- [Custom Icons](/en/demo/custom-icon) - Learn how to add custom icons to links
+- [Tailwind Styles](/en/demo/tailwind) - Use Tailwind CSS to customize link styles

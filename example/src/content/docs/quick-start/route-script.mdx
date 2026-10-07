@@ -1,0 +1,124 @@
+---
+title: "断链检查"
+description: "使用 astro-smart-links 检查站内断链并生成报告"
+---
+
+
+astro-smart-links 会在构建结束时使用真实路由表校验所有内部链接。不再需要生成路由文件，也不需要二次构建。
+
+## 工作原理
+
+1. 编译 Markdown 时，插件为外部链接和内部链接添加类名。
+2. 构建完成后，集成扫描 `dist` 目录中的实际页面，得到完整路由表。
+3. 所有指向不存在页面的内部链接会被替换为 `broken-link` 类名，并写入报告。
+
+链接匹配时会自动忽略查询参数与哈希（`/about?x=1#team` 视为 `/about`），并处理相对链接、`base` 子路径和 `trailingSlash` 差异。
+
+## 报告输出
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { smartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  integrations: [
+    smartLinks({
+      // 将报告写入项目根目录，支持 .json 和 .html
+      reportFile: '.smart-links-report.json',
+      // 发现有断链时让构建失败，适合 CI
+      failOnBroken: true,
+    }),
+  ],
+});
+```
+
+控制台输出示例：
+
+```
+[astro-smart-links] Smart links report (2026-01-01T00:00:00.000Z)
+Routes scanned: 42
+Links: 180 internal, 12 external, 2 broken
+
+Broken internal links:
+  /blog/old-post (found in src/content/blog/new-post.md)
+  /docs/missing (found in src/pages/index.md)
+```
+
+JSON 报告结构：
+
+```json
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "routes": 42,
+  "links": { "internal": 180, "external": 12, "broken": 2 },
+  "broken": [
+    {
+      "href": "/blog/old-post",
+      "pathname": "/blog/old-post",
+      "sources": ["/path/to/project/src/content/blog/new-post.md"]
+    }
+  ]
+}
+```
+
+## 使用 CLI 检查任意构建目录
+
+对于非 Astro 项目或已构建的静态站点，可以使用内置 CLI：
+
+```bash
+# 检查 dist 目录，输出控制台报告
+npx astro-smart-links check
+
+# 指定目录、输出报告文件、发现断链时退出码为 1
+npx astro-smart-links check --dir dist --output report.json --fail-on-broken
+
+# 输出 JSON 到 stdout，方便接入 CI
+npx astro-smart-links check --json
+
+# 将 PDF、ZIP 等文件也视为有效路由
+npx astro-smart-links check --all
+npx astro-smart-links check --extensions html pdf zip
+```
+
+CLI 选项：
+
+```
+选项：
+  -d, --dir <path>        构建目录路径 (默认: "./dist")
+  -o, --output <path>     将报告写入文件
+      --format <format>   报告格式: json 或 html (默认: "json")
+      --json              以 JSON 输出到 stdout
+  -a, --all               将所有文件类型视为有效路由
+  -e, --extensions <ext...> 要包含的文件扩展名 (默认: ["html"])
+      --fail-on-broken    发现断链时以退出码 1 结束
+  -q, --quiet             只输出摘要
+```
+
+在 `package.json` 中添加快捷脚本：
+
+```json
+{
+  "scripts": {
+    "check:links": "astro-smart-links check --fail-on-broken"
+  }
+}
+```
+
+## 忽略特定链接
+
+草稿、外部预览等链接可以通过 `ignore` 跳过：
+
+```js
+smartLinks({
+  ignore: ['/draft/', /^\/preview\//],
+}),
+```
+
+## 故障排除
+
+如果断链没有被识别：
+
+1. 确认链接是站内链接（以 `/` 开头或相对路径），而不是 `http(s)://`、`mailto:`、`tel:` 或 `#` 锚点。
+2. 确认目标页面确实会被构建输出（检查 `dist` 目录）。
+3. 如果站点部署在子路径下，确认 Astro 配置中的 `base` 与链接一致（插件会自动处理，无需手动加前缀）。

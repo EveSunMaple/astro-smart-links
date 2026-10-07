@@ -1,0 +1,69 @@
+---
+title: "About the Plugin"
+description: "Learn about the features and design philosophy of astro-smart-links"
+---
+
+
+astro-smart-links is a rehype plugin designed to enhance links in Markdown documents. It adds smart navigation and styling features to help users distinguish between different types of links, improving the document reading experience.
+
+## Features
+
+### 1. Smart Link Classification
+
+The plugin automatically detects and categorizes links into three types:
+
+- **Internal Links** - Links pointing to pages within your website
+- **External Links** - Links pointing to other websites
+- **Broken Links** - Links pointing to non-existent pages
+
+### 2. Class Names and Attribute Addition
+
+The plugin adds specific class names and attributes to different types of links:
+
+```html
+<!-- Internal link -->
+<a href="/about" class="internal-link">About Page</a>
+
+<!-- External link -->
+<a href="https://example.com" class="external-link" target="_blank" rel="noopener noreferrer">Example Website</a>
+
+<!-- Broken link -->
+<a href="/non-existent" class="broken-link">Non-existent Page</a>
+```
+
+### 3. Customization Options
+
+The plugin provides a rich set of customization options that allow you to adjust link handling behavior according to your needs:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `internalLinkClass` | `string` | `'internal-link'` | Class name for internal links |
+| `externalLinkClass` | `string` | `'external-link'` | Class name for external links |
+| `brokenLinkClass` | `string` | `'broken-link'` | Class name for broken links |
+| `target` | `string` | `'_blank'` | Target attribute for external links |
+| `rel` | `string` | `'noopener noreferrer'` | Rel attribute for external links |
+| `ignore` | `(string \| RegExp)[]` | `[]` | Links that are never processed |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | Icon content appended to external links |
+| `routes` / `routesFile` / `publicDir` | — | — | Route sources for broken-link detection (automatic when using the integration) |
+| `failOnBroken` | `boolean` | `false` | Fail the build on broken links (integration option) |
+
+## Use Cases
+
+astro-smart-links is suitable for various projects using Markdown:
+
+- **Documentation Sites** - Enhance document navigation experience
+- **Blog Platforms** - Improve link usability in blog posts
+- **Knowledge Bases** - Better link accessibility in knowledge base content
+
+## Getting Started
+
+Check out our [Quick Start](/en/quick-start) guide to learn how to use astro-smart-links in your project.
+
+## Examples
+
+- [Basic Demo](/en/demo/basic) - View basic functionality
+- [Advanced Features](/en/demo/advanced) - Explore advanced usage
+
+## Contributing
+
+We welcome community contributions! If you have any questions or suggestions, please submit an issue or pull request to the [GitHub repository](https://github.com/EveSunMaple/astro-smart-links).

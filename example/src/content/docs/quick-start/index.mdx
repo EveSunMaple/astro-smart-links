@@ -1,0 +1,134 @@
+---
+title: "安装指南"
+description: "快速上手使用 astro-smart-links 插件"
+---
+
+
+astro-smart-links 是一个 Astro 集成，可以为 Markdown 中的内部链接、断开的内部链接和外部链接添加不同的样式，并在构建结束时检查断链。
+
+## 安装
+
+使用你偏好的包管理器安装插件：
+
+```bash
+# 使用 npm
+npm install astro-smart-links
+
+# 使用 yarn
+yarn add astro-smart-links
+
+# 使用 pnpm
+pnpm add astro-smart-links
+```
+
+## 基础配置
+
+在 `astro.config.mjs` 中注册集成：
+
+```js
+import { defineConfig } from 'astro/config';
+import { smartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  integrations: [
+    smartLinks({
+      internalLinkClass: 'internal-link',
+      externalLinkClass: 'external-link',
+      brokenLinkClass: 'broken-link',
+    }),
+  ],
+});
+```
+
+构建时集成会：
+
+1. 为外部链接添加类名、`target`、`rel` 和图标。
+2. 为内部链接添加 `internal-link` 类名。
+3. 构建完成后使用真实路由表校验所有内部链接，为断链添加 `broken-link` 类名并输出报告。
+
+**不再需要二次构建或路由脚本。** 之前的 `astro build && rehype-smart-links build && astro build` 流程已被移除。
+
+### 让断链检查失败并中止构建
+
+```js
+smartLinks({
+  failOnBroken: true,
+  reportFile: '.smart-links-report.json',
+}),
+```
+
+## 在非 Astro 项目中使用
+
+如果项目使用 rehype 处理 Markdown（Next.js、Gatsby 等），可以使用具名导出的 rehype 插件。此时需要自行提供路由信息：
+
+```js
+const { rehypeSmartLinks } = require('astro-smart-links');
+
+module.exports = {
+  rehypePlugins: [
+    [rehypeSmartLinks, { routes: ['/', '/about'] }],
+  ],
+};
+```
+
+路由来源三选一：`routes`（数组）、`routesFile`（JSON 文件）或 `publicDir`（构建目录）。都不提供时，所有内部链接都会被视为有效链接，只做样式标记。
+
+## 添加样式
+
+插件会为不同类型的链接添加以下 CSS 类：
+
+- `internal-link`: 应用于内部链接（指向你网站内的页面）
+- `broken-link`: 应用于断开的内部链接（指向不存在的页面）
+- `external-link`: 应用于外部链接（指向其他网站）
+
+你可以在全局 CSS 文件中添加样式：
+
+```css
+/* 内部链接样式 */
+.internal-link {
+  color: #3b82f6;
+  position: relative;
+}
+
+/* 断开链接样式（类似维基百科的红链） */
+.broken-link {
+  color: #ef4444;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+/* 外部链接样式 */
+.external-link {
+  color: #10b981;
+}
+
+.external-link .external-icon {
+  margin-left: 0.25em;
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+```
+
+## 主要配置选项
+
+| 选项 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `internalLinkClass` | `string` | `'internal-link'` | 内部链接的 CSS 类 |
+| `externalLinkClass` | `string` | `'external-link'` | 外部链接的 CSS 类 |
+| `brokenLinkClass` | `string` | `'broken-link'` | 断开链接的 CSS 类 |
+| `content` | `object \| null` | `{ type: 'text', value: '↗' }` | 外部链接追加的内容，设为 `null` 可禁用图标 |
+| `contentClass` | `string` | `'external-icon'` | 外部链接图标的 CSS 类 |
+| `target` / `rel` | `string` | `'_blank'` / `'noopener noreferrer'` | 外部链接属性 |
+| `ignore` | `(string \| RegExp)[]` | `[]` | 不处理这些链接（前缀匹配或正则） |
+| `routes` | `string[]` | — | 显式路由列表 |
+| `routesFile` | `string` | — | 路由 JSON 文件路径 |
+| `publicDir` | `string` | — | 扫描路由的构建目录 |
+| `base` | `string` | Astro 配置中的 `base` | 站点子路径 |
+| `wrapperTemplate` | `function` | — | 完全自定义链接的 HTML 结构 |
+| `customInternalLinkTransform` | `function` | — | 内部链接的自定义转换 |
+| `customExternalLinkTransform` | `function` | — | 外部链接的自定义转换 |
+| `customBrokenLinkTransform` | `function` | — | 断链的自定义转换 |
+| `failOnBroken` | `boolean` | `false` | 集成选项：发现断链时让构建失败 |
+| `reportFile` | `string` | — | 集成选项：将报告写入文件（`.json` 或 `.html`） |
+
+查看 [高级演示](/demo/advanced) 获取更多自定义选项的示例。

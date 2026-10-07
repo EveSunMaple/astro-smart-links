@@ -1,0 +1,46 @@
+---
+title: astro-smart-links
+description: An Astro integration that styles links and detects broken links at build time
+template: splash
+hero:
+  title: astro-smart-links
+  tagline: Style internal, external and broken links in your Markdown, and get a broken link report at the end of the build — no second build and no routes file.
+  actions:
+    - text: View demos
+      link: /en/demo/basic/
+      icon: right-arrow
+      variant: primary
+    - text: Quick start
+      link: /en/quick-start/
+      icon: rocket
+      variant: secondary
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <LinkCard title="Installation" href="/en/quick-start/" description="Install and enable the smartLinks() integration" />
+  <LinkCard title="Broken links" href="/en/quick-start/route-script/" description="Build reports, CLI and failOnBroken" />
+  <LinkCard title="Basic demo" href="/en/demo/basic/" description="Default internal, external and broken styles" />
+  <LinkCard title="Advanced features" href="/en/demo/advanced/" description="wrapperTemplate and custom transforms" />
+  <LinkCard title="Tailwind styles" href="/en/demo/tailwind/" description="Style links with Tailwind utilities" />
+  <LinkCard title="DaisyUI components" href="/en/demo/daisyui/" description="Badges, buttons and card links" />
+</CardGrid>
+
+## Install
+
+```bash
+npm install astro-smart-links
+```
+
+## Usage
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { smartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  integrations: [smartLinks()],
+});
+```

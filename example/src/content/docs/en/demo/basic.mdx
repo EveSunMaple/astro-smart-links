@@ -1,0 +1,59 @@
+---
+title: "Basic Demo"
+description: "Basic functionality demonstration of astro-smart-links"
+---
+
+
+This page demonstrates the basic functionality of astro-smart-links. You can see how different types of links are processed and styled.
+
+## Internal Links
+
+Internal links are automatically recognized and styled accordingly. For example:
+
+- [Home](/en) - Link to the website homepage
+- [About Page](/en/about) - Link to the about page
+- [Non-existent Page](/en/this-page-does-not-exist) - Link to a page that doesn't exist (will be marked as a broken link)
+
+## Broken Links
+
+The plugin automatically detects and marks links to non-existent pages:
+
+- [Broken Link Example](/en/broken-link-example) - This page doesn't exist
+- [Another Broken Link](/en/another-broken-link) - This page doesn't exist either
+
+## External Links
+
+External links automatically get appropriate attributes, including `target="_blank"` and `rel="noopener noreferrer"`:
+
+- [GitHub](https://github.com) - Link to GitHub
+- [MDN Web Docs](https://developer.mozilla.org) - Link to MDN
+- [Astro Docs](https://docs.astro.build) - Link to Astro documentation
+
+## Configuration Example
+
+To enable these features, simply add the following code to your configuration file:
+
+```js
+// Astro configuration example (astro.config.mjs)
+import { defineConfig } from 'astro/config';
+import { rehypeSmartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  markdown: {
+    rehypePlugins: [[rehypeSmartLinks, {
+      // Basic configuration options
+      internalLinkClass: 'internal-link',
+      brokenLinkClass: 'broken-link',
+      externalLinkClass: 'external-link'
+    }]]
+  }
+});
+```
+
+## Next Steps
+
+Explore more examples:
+
+- [Advanced Features](/en/demo/advanced) - View advanced features and customization options
+- [CSS Custom Styling](/en/demo/custom-css) - Learn how to customize link styles with CSS
+- [Custom Icons](/en/demo/custom-icon) - Learn how to add custom icons to links

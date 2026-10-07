@@ -1,0 +1,46 @@
+---
+title: astro-smart-links
+description: 为 Markdown 链接添加智能样式与断链检测的 Astro 集成
+template: splash
+hero:
+  title: astro-smart-links
+  tagline: 自动区分内部链接、断开链接与外部链接，构建结束时输出断链报告——无需二次构建，也无需路由文件。
+  actions:
+    - text: 查看演示
+      link: /demo/basic/
+      icon: right-arrow
+      variant: primary
+    - text: 快速上手
+      link: /quick-start/
+      icon: rocket
+      variant: secondary
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <LinkCard title="安装指南" href="/quick-start/" description="安装并启用 smartLinks() 集成" />
+  <LinkCard title="断链检查" href="/quick-start/route-script/" description="构建期报告、CLI 与 failOnBroken" />
+  <LinkCard title="基本演示" href="/demo/basic/" description="查看内部、外部与断链的默认样式" />
+  <LinkCard title="高级功能" href="/demo/advanced/" description="wrapperTemplate 与自定义转换" />
+  <LinkCard title="Tailwind 样式" href="/demo/tailwind/" description="用 Tailwind 工具类美化链接" />
+  <LinkCard title="DaisyUI 组件" href="/demo/daisyui/" description="徽章、按钮、卡片式链接" />
+</CardGrid>
+
+## 安装
+
+```bash
+npm install astro-smart-links
+```
+
+## 使用
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import { smartLinks } from 'astro-smart-links';
+
+export default defineConfig({
+  integrations: [smartLinks()],
+});
+```
