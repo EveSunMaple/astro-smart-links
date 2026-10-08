@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.1.1
+
+### Added
+
+- `skipClasses` option (integration, `checkDirectory()` and the `check` CLI via `--skip-classes`): links inside elements carrying one of these classes are skipped by the build-time check and are never rewritten. This keeps component or demo markup that opts out of content styles (e.g. Starlight's `not-content`) untouched.
+
+### Fixed
+
+- The example site's demo previews no longer receive an injected `broken-link` class from the build check, so each preview again shows exactly the styling produced by its documented snippet.
+
 ## 1.1.0
 
 ### Added

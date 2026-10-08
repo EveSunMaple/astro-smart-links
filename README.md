@@ -118,6 +118,7 @@ npx astro-smart-links check --all --extensions html pdf zip
 | `--json` | Print the report to stdout |
 | `-a, --all` | Treat every file type as a valid route |
 | `-e, --extensions <ext...>` | File extensions to include (default `html`) |
+| `--skip-classes <class...>` | Skip links inside elements with these classes |
 | `--fail-on-broken` | Exit with code 1 when broken links are found |
 | `-q, --quiet` | Only print the summary |
 
@@ -133,6 +134,7 @@ npx astro-smart-links check --all --extensions html pdf zip
 | `target` | `string \| null` | `'_blank'` | `target` attribute for external links |
 | `rel` | `string \| null` | `'noopener noreferrer'` | `rel` attribute for external links |
 | `ignore` | `(string \| RegExp)[]` | `[]` | Hrefs that are never processed (prefix match or RegExp) |
+| `skipClasses` | `string[]` | `[]` | Skip links inside elements with these classes (e.g. `['not-content']`) |
 | `routes` | `string[]` | — | Explicit route list for broken-link detection |
 | `routesFile` | `string` | — | JSON file with a route list |
 | `publicDir` | `string` | — | Directory to scan for routes |

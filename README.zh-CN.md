@@ -118,6 +118,7 @@ npx astro-smart-links check --all --extensions html pdf zip
 | `--json` | 以 JSON 输出到 stdout |
 | `-a, --all` | 将所有文件类型视为有效路由 |
 | `-e, --extensions <ext...>` | 要包含的文件扩展名（默认 `html`） |
+| `--skip-classes <class...>` | 跳过位于这些类名元素内的链接 |
 | `--fail-on-broken` | 发现断链时以退出码 1 结束 |
 | `-q, --quiet` | 只输出摘要 |
 
@@ -133,6 +134,7 @@ npx astro-smart-links check --all --extensions html pdf zip
 | `target` | `string \| null` | `'_blank'` | 外部链接的 `target` |
 | `rel` | `string \| null` | `'noopener noreferrer'` | 外部链接的 `rel` |
 | `ignore` | `(string \| RegExp)[]` | `[]` | 不处理的链接（前缀匹配或正则） |
+| `skipClasses` | `string[]` | `[]` | 跳过位于这些类名元素内的链接（如 `['not-content']`） |
 | `routes` | `string[]` | — | 显式路由列表 |
 | `routesFile` | `string` | — | 包含路由列表的 JSON 文件 |
 | `publicDir` | `string` | — | 扫描路由的目录 |

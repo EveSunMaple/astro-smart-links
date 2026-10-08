@@ -43,6 +43,12 @@ export interface SmartLinksOptions {
    * normalized pathname (for strings: prefix match).
    */
   ignore?: (string | RegExp)[];
+  /**
+   * Links inside elements carrying one of these classes are skipped by the
+   * build-time check and are never rewritten. Useful for component or demo
+   * markup that opts out of content styles (e.g. Starlight's `not-content`).
+   */
+  skipClasses?: string[];
   /** Explicit list of known routes. When provided, broken links are detected. */
   routes?: string[];
   /** Path to a JSON file containing a list of known routes. */

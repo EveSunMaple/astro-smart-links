@@ -70,6 +70,10 @@ export default defineConfig({
     smartLinks({
       reportFile: ".smart-links-report.json",
       ignore: [/\/draft\//, /\/preview\//],
+      // Demo previews and code blocks opt out of content styles with
+      // `not-content`; leave their links untouched so each demo keeps showing
+      // exactly what its snippet produces.
+      skipClasses: ["not-content"],
     }),
   ],
   vite: {

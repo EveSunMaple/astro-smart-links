@@ -95,6 +95,7 @@ export function smartLinks(options: SmartLinksIntegrationOptions = {}): AstroInt
         const { routes, broken } = checkDirectory(distDir, {
           base: current.base,
           ignore: current.ignore,
+          skipClasses: current.skipClasses,
           includeAllFiles: current.includeAllFiles,
           includeFileExtensions: current.includeFileExtensions,
           rewrite: true,

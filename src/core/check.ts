@@ -1,4 +1,4 @@
-import type { Root } from "hast";
+import type { Element, Root } from "hast";
 
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -6,7 +6,6 @@ import { join, relative } from "node:path";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
-import { visit } from "unist-util-visit";
 
 import { classifyHref } from "./classify.js";
 import { addClass, removeClass } from "./hast.js";
@@ -24,6 +23,12 @@ export interface CheckDirectoryOptions extends ScanRoutesOptions {
   /** Known routes. When omitted, routes are collected by scanning the directory. */
   routes?: Set<string>;
   ignore?: (string | RegExp)[];
+  /**
+   * Links inside elements carrying one of these classes are skipped entirely:
+   * they are not checked and never rewritten. Useful for component or demo
+   * markup that opts out of content styles (e.g. Starlight's `not-content`).
+   */
+  skipClasses?: string[];
   /** Rewrite generated HTML so broken links receive `brokenLinkClass`. */
   rewrite?: boolean;
   internalLinkClass?: string;
@@ -60,9 +65,19 @@ export function routeFromHtmlFile(distDir: string, htmlFile: string): string {
   return normalizeRoute(relativePath);
 }
 
+function hasAnyClass(node: Element, classes: string[]): boolean {
+  const current = node.properties?.className;
+  const list = Array.isArray(current)
+    ? current.map(String)
+    : typeof current === "string" ? current.split(/\s+/) : [];
+
+  return classes.some((className) => list.includes(className));
+}
+
 export function checkDirectory(directory: string, options: CheckDirectoryOptions = {}): CheckDirectoryResult {
   const routes = options.routes
     ?? scanRoutes(directory, options);
+  const skipClasses = options.skipClasses ?? [];
   const broken: BrokenAnchor[] = [];
   let checkedLinks = 0;
 
@@ -76,37 +91,45 @@ export function checkDirectory(directory: string, options: CheckDirectoryOptions
     const pagePath = routeFromHtmlFile(directory, htmlFile);
     let changed = false;
 
-    visit(tree, "element", (node) => {
-      if (node.tagName !== "a" || !node.properties)
-        return;
+    const walk = (parent: Root | Element, insideSkipped: boolean): void => {
+      for (const child of parent.children) {
+        if (child.type !== "element")
+          continue;
 
-      const href = node.properties.href;
-      if (typeof href !== "string" || href.length === 0)
-        return;
+        const skipped = insideSkipped
+          || (skipClasses.length > 0 && hasAnyClass(child, skipClasses));
 
-      const classified = classifyHref(href, {
-        base: options.base,
-        routes,
-        ignore: options.ignore,
-        pagePath,
-      });
+        if (child.tagName === "a" && !skipped && child.properties) {
+          const href = child.properties.href;
+          if (typeof href === "string" && href.length > 0) {
+            const classified = classifyHref(href, {
+              base: options.base,
+              routes,
+              ignore: options.ignore,
+              pagePath,
+            });
 
-      if (classified.type === "ignored")
-        return;
+            if (classified.type !== "ignored") {
+              checkedLinks++;
 
-      checkedLinks++;
+              if (classified.type === "broken") {
+                broken.push({ href, pathname: classified.pathname ?? href, sourceFile: htmlFile });
 
-      if (classified.type !== "broken")
-        return;
+                if (options.rewrite) {
+                  removeClass(child, options.internalLinkClass);
+                  addClass(child, options.brokenLinkClass);
+                  changed = true;
+                }
+              }
+            }
+          }
+        }
 
-      broken.push({ href, pathname: classified.pathname ?? href, sourceFile: htmlFile });
-
-      if (options.rewrite) {
-        removeClass(node, options.internalLinkClass);
-        addClass(node, options.brokenLinkClass);
-        changed = true;
+        walk(child, skipped);
       }
-    });
+    };
+
+    walk(tree, false);
 
     if (changed)
       writeFileSync(htmlFile, processor.stringify(tree));

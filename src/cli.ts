@@ -17,6 +17,7 @@ interface CheckCliOptions {
   json: boolean;
   all: boolean;
   extensions: string[];
+  skipClasses?: string[];
   failOnBroken: boolean;
   quiet: boolean;
 }
@@ -33,7 +34,7 @@ const program = new Command();
 program
   .name("astro-smart-links")
   .description("CLI utility for astro-smart-links")
-  .version("1.1.0");
+  .version("1.1.1");
 
 program
   .command("check", { isDefault: true })
@@ -44,6 +45,7 @@ program
   .option("--json", "Print the report to stdout as JSON", false)
   .option("-a, --all", "Treat every file type as a valid route", false)
   .option("-e, --extensions <ext...>", "File extensions to treat as routes", ["html"])
+  .option("--skip-classes <class...>", "Skip links inside elements with these classes")
   .option("--fail-on-broken", "Exit with code 1 when broken links are found", false)
   .option("-q, --quiet", "Only print the summary line", false)
   .action((options: CheckCliOptions) => {
@@ -58,6 +60,7 @@ program
     const { routes, broken, checkedLinks } = checkDirectory(buildDir, {
       includeAllFiles: options.all,
       includeFileExtensions: options.extensions,
+      skipClasses: options.skipClasses,
       rewrite: false,
       routes: scanRoutes(buildDir, {
         includeAllFiles: options.all,
